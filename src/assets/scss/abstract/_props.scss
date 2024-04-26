@@ -1,0 +1,119 @@
+// position
+%p {
+  &-relative {
+    position: relative;
+  }
+
+  &-absolute {
+    position: absolute;
+  }
+
+  &-fixed {
+    position: fixed;
+  }
+
+  &-sticky {
+    position: sticky;
+  }
+}
+
+// display
+%d {
+  &-inline-block {
+    display: inline-block;
+  }
+
+  &-inline {
+    display: inline;
+  }
+
+  &-block {
+    display: block;
+  }
+
+  &-none {
+    display: none;
+  }
+
+  &-contents {
+    display: contents;
+  }
+}
+
+// dimension
+
+%w {
+  &-fit {
+    width: fit-content;
+  }
+
+  &-100 {
+    width: 100%;
+  }
+
+  &-50 {
+    width: 50%;
+  }
+}
+
+%h {
+  &-fit {
+    height: fit-content;
+  }
+
+  &-100 {
+    height: 100%;
+  }
+
+  &-50 {
+    height: 50%;
+  }
+}
+
+
+// centralize
+%centralize {
+  display: grid;
+  place-content: center;
+}
+
+// ----------------------------------------------------------------------------
+// misc
+// ----------------------------------------------------------------------------
+
+%transition {
+  transition: all 0.2s;
+}
+
+%list-none {
+  list-style: none;
+}
+
+%square {
+  width: var(--square);
+  height: var(--square);
+}
+
+%round {
+  border-radius: 50%;
+}
+
+%pointer {
+  cursor: pointer;
+}
+
+%pointer-none {
+  pointer-events: none;
+}
+
+%isolate {
+  isolation: isolate;
+}
+
+%select-none {
+  user-select: none;
+}
+
+%overflow-hidden {
+  overflow: hidden;
+}

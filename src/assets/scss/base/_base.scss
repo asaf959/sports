@@ -1,0 +1,78 @@
+@use "../abstract/variables" as var;
+@use "../abstract/functions" as func;
+@use "../abstract/props";
+@use "../abstract/typography";
+
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap");
+
+:root {
+  --family: #{var.$family};
+
+  @each $size in var.$sizes {
+    --fs-#{$size}: #{calc($size / 16) + rem};
+  }
+
+  @each $name,
+  $value in var.$colors {
+    --#{$name}: #{$value};
+  }
+}
+
+::-webkit-scrollbar {
+  width: func.rem(8);
+  height: func.rem(8);
+
+  &-track {
+    background-color: rgba(68, 139, 255, 0.13);
+    border: func.rem(8);
+  }
+
+  &-thumb {
+    background-color: var(--clr-primary-main);
+    border-radius: func.rem(8);
+    border: none;
+  }
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--family);
+  font-size: var(--fs-16);
+  @extend %fw-400;
+}
+
+html,
+body {
+  height: 100vh;
+}
+
+input,
+select,
+button,
+textarea {
+  font-family: var(--family);
+  outline-color: var(--clr-black);
+
+  &:focus,
+  &:focus-visible {
+    outline: none;
+  }
+}
+
+figure,
+table,
+picture,
+img,
+iframe,
+svg {
+  max-width: 100%;
+}
+
+#root {
+  @extend %d-contents;
+}

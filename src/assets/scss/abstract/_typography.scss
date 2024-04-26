@@ -1,0 +1,30 @@
+@for $i from 1 through 9 {
+  %fw-#{$i * 100} {
+    font-weight: ($i * 100);
+  }
+}
+
+// text
+%text {
+  &-uppercase {
+    text-transform: uppercase;
+  }
+  &-capitalize {
+    text-transform: capitalize;
+  }
+  &-lowercase {
+    text-transform: lowercase;
+  }
+  &-start {
+    text-align: start;
+  }
+  &-center {
+    text-align: center;
+  }
+  &-end {
+    text-align: end;
+  }
+  &-decoration {
+    text-decoration: none;
+  }
+}

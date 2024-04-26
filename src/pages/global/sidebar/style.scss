@@ -1,0 +1,12 @@
+@use "../../../app/import.scss" as *;
+
+.ps-menu-button {
+  &:hover {
+    background-color: transparent !important;
+    color: #868dfb !important;
+  }
+}
+
+.ps-active {
+  color: #6870fa !important;
+}

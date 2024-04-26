@@ -1,0 +1,62 @@
+@use "functions" as func;
+
+// breakpoint
+@mixin breakpoint($breakpoint, $type: max, $dimension: width) {
+  @if ($dimension ==width) {
+    @if ($type ==min) {
+      @media only screen and (min-width: #{$breakpoint + px}) {
+        @content;
+      }
+    }
+
+    @else {
+      @media only screen and (max-width: #{$breakpoint + px}) {
+        @content;
+      }
+    }
+  }
+
+  @if ($dimension ==height) {
+    @if ($type ==min) {
+      @media only screen and (min-height: #{$breakpoint + px}) {
+        @content;
+      }
+    }
+
+    @else {
+      @media only screen and (max-height: #{$breakpoint + px}) {
+        @content;
+      }
+    }
+  }
+}
+
+// flex
+@mixin flex($align-item: null, $justify-content: null, $gap: null, $direction: null, $flex: true) {
+  @if $flex {
+    display: flex;
+  }
+
+  align-items: $align-item;
+  justify-content: $justify-content;
+  flex-direction: $direction;
+  gap: $gap;
+}
+
+// grid
+@mixin grid($column: null, $row: null, $gap: null, $area: null, $grid: true) {
+  @if $grid {
+    display: grid;
+  }
+
+  grid-template-columns: $column;
+  grid-template-rows: $row;
+  grid-template-areas: $area;
+  gap: $gap;
+}
+
+// square
+@mixin square($size) {
+  --square: #{func.rem($size)};
+  @extend %square !optional;
+}
