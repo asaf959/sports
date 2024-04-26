@@ -2,6 +2,7 @@ import { Box, Grid, Paper } from "@mui/material";
 import PageHeader from "../../components/header";
 import { Button } from "../../components/button";
 import AppInput from "../../components/newInput";
+import sports from "../../utils/sports";
 import { useEffect, useState } from "react";
 import API_CALL from "../../services";
 import { getSportFromSession } from "../../utils/utils";
@@ -13,17 +14,6 @@ function Combination() {
     sport3: "",
     sport4: "",
   });
-
-  const sports = [
-    { value: "mlb", label: "Baseball (MLB)" },
-    { value: "nba", label: "Basketball (NBA)" },
-    { value: "cfl", label: "Football (CFL)" },
-    { value: "nfl", label: "Football (NFL)" },
-    { value: "nhl", label: "Hockey (NHL)" },
-    { value: "ufc", label: "MMA (UFC)" },
-    { value: "f1", label: "Racing (F1)" },
-    { value: "tennis", label: "Tennis" },
-  ];
 
   const combination = Object.values(inputs).map(sport => {
     const data = sports.find(val => val.value === sport)
@@ -42,43 +32,20 @@ function Combination() {
     await API_CALL.createCombination({ ...getSportFromSession(), combination })
   }
 
-  // async function getCombination() {
-  //   const sportArr = [Object.values(getSportFromSession())[0], Object.values(getSportFromSession())[1]] as const;
-  //   const { data: res } = await API_CALL.getCombination(...sportArr);
-  //   console.log("Fetched data:", res.data.combination.combination);
-   
-  //   const updatedInputs = { ...inputs };
-  //   res.data.combination.combination.forEach((val: any, id: number) => {
-  //      const inputKey = Object.keys(inputs)[id];
-  //      // Find the corresponding option in your selectOptions based on the sport name
-  //      const matchingOption = sports.find(option => option.label.toLowerCase().includes(val.sport.toLowerCase()));
-  //      updatedInputs[inputKey] = matchingOption ? matchingOption.value : '';
-  //   });
-   
-  //   console.log("Updated inputs:", updatedInputs);
-  //   setInputs(updatedInputs);
-  //  }
   async function getCombination() {
-    const sportArr = [Object.values(getSportFromSession())[0], Object.values(getSportFromSession())[1]] as const;
-    const { data: res } = await API_CALL.getCombination(...sportArr);
-    console.log("Fetched data:", res.data.combination.combination);
-   
-    const updatedInputs = { ...inputs };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    res.data.combination.combination.forEach((val: any, id: number) => {
-       const inputKey = Object.keys(inputs)[id];
-       // Find the corresponding option in your selectOptions based on the sport name
-       const matchingOption = sports.find(option => option.label.toLowerCase().includes(val.sport.toLowerCase()));
-       updatedInputs[inputKey as keyof typeof updatedInputs] = matchingOption ? matchingOption.value : '';
-    });
-   
-    console.log("Updated inputs:", updatedInputs);
-    setInputs(updatedInputs);
-   }
-   
-   
-   
-   console.log(inputs)
+    const sportArr = [Object.values(getSportFromSession())[0], Object.values(getSportFromSession())[1]] as const
+    const { data: res } = await API_CALL.getCombination(...sportArr)
+    setInputs(((prev) => {
+      const obj = { ...inputs }
+      const arr = (res.data?.combination?.combination as Record<string, string>[])?.map(val => val?.league).slice(0, 4) || []
+      arr.forEach((val: string, id: number) => {
+        const inputArr = Object.keys(inputs) as unknown as keyof typeof inputs[] as keyof typeof inputs
+        const idx = inputArr[id] as keyof typeof inputs
+        obj[idx] = val
+      })
+      return { ...prev, ...obj }
+    }))
+  }
 
   useEffect(() => {
     getCombination()
@@ -107,12 +74,12 @@ function Combination() {
               <Grid item xs={6} sx={{ marginBottom: "30px" }}>
                 <AppInput label="Sports 2" selectOptions={sports} name="sport2" onChange={handleInputChange} value={inputs.sport2} />
               </Grid>
-              {/* <Grid item xs={6}>
+              <Grid item xs={6}>
                 <AppInput label="Sports 3" selectOptions={sports} name="sport3" onChange={handleInputChange} value={inputs.sport3} />
               </Grid>
               <Grid item xs={6}>
                 <AppInput label="Sports 4" selectOptions={sports} name="sport4" onChange={handleInputChange} value={inputs.sport4} />
-              </Grid> */}
+              </Grid>
             </Grid>
             <Grid
               item

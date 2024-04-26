@@ -3,7 +3,7 @@ import { LinkProps } from "@mui/material/Link";
 import { createTheme, Theme, ThemeOptions } from "@mui/material/styles";
 import { createContext, useState, useMemo } from "react";
 
-import LinkBehavior from "../src/utils/linkBehaviour";
+import LinkBehavior from "./utils/linkBehaviour";
 
 export const tokens = (mode: PaletteMode) => ({
   ...(mode === "dark"

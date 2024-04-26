@@ -1,6 +1,3 @@
-import { appRole, } from "../interface";
-import { accountType as accountInterface, transactionType as transactionInterface } from "../interface/invoice";
-
 export const genderData = [
   {
     name: "Male",
@@ -24,50 +21,6 @@ export const transactionTypes = [
     allow: ["gym-owner", "gym-manager"]
   }
 ];
-
-type roleType = appRole;
-
-interface accountsInterface {
-  name: string;
-  value: accountInterface;
-  transactionType: transactionInterface;
-  allow: roleType[];
-}
-
-// export const accountTypes = (role: roleType, transactionType: transactionInterface) => {
-//   const accounts: accountsInterface[] = [
-//     {
-//       name: "Member",
-//       value: "member",
-//       transactionType: "in",
-//       allow: ["gym-owner", "gym-manager"]
-//     },
-//     {
-//       name: "Trainer",
-//       value: "trainer",
-//       transactionType: "out",
-//       allow: ["gym-owner", "gym-manager"]
-//     },
-//     {
-//       name: "User",
-//       value: "user",
-//       transactionType: role === "admin" || role === "moderator" ? "in" : "out",
-//       allow: ["admin", "moderator", "gym-owner"]
-//     },
-//     {
-//       name: "Expense",
-//       value: "expense",
-//       transactionType: "out",
-//       allow: ["gym-owner", "gym-manager"]
-//     }
-//   ];
-//   const roleFiltering = accounts.filter(val => val.allow.includes(role));
-//   const transactionFiltering = roleFiltering
-//     .filter(val => val.transactionType === transactionType)
-//     .map(val => ({ name: val.name, value: val.value }));
-
-//   return transactionFiltering;
-// };
 
 export interface Month {
   name: string;

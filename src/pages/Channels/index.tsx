@@ -14,21 +14,13 @@ function Channels() {
     { title: "", link: "" }
   ]);
 
-  // function onChange(idx: number, e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
-  //   setChannels(prev => {
-  //     const arr = [...prev]
-  //     arr[idx][e.target.name] = e.target.value
-  //     return arr
-  //   })
-  // }
   function onChange(idx: number, e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
-    const { name, value } = e.target;
     setChannels(prev => {
-      const arr = [...prev];
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (arr[idx] as any)[name] = value;
-      return arr;
-    });
+      const arr = [...prev]
+      const el = e.target.name as keyof typeof channels[0]
+      arr[idx][el] = e.target.value
+      return arr
+    })
   }
 
   async function createChannel() {

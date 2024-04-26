@@ -10,33 +10,30 @@ import { redirect } from "react-router-dom";
 
 
 function ManageAccount() {
-  // const user = getCurrentUser();
-  // console.log(user.name)    
   const [user, setUser] = useState({ name: '', email: '', password: '', passwordConfirm: '' });
- const [loading, setLoading] = useState(false);
- const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
- useEffect(() => {
+  useEffect(() => {
     const currentUser = getCurrentUser();
     if (currentUser) {
       setUser({ name: currentUser.name, email: currentUser.email, password: '', passwordConfirm: '' });
     }
- }, []);
-const handleSubmit : React.FormEventHandler<HTMLFormElement> = async (e) => {
-  e.preventDefault();
-  setLoading(true);
-  setError(null);
-  try {
-    const data = await API_CALL.updateMe(user);
-    return redirect(manageAccountPath)
-    // Handle success, e.g., show a success message or redirect
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (err: any ) {
-    setError(err.message);
-  } finally {
-    setLoading(false);
-  }
-};
+  }, []);
+  const handleSubmit: React.FormEventHandler<HTMLFormElement> | undefined = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    try {
+      await API_CALL.updateMe(user);
+      return redirect(manageAccountPath)
+      // Handle success, e.g., show a success message or redirect
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
   return (
@@ -50,7 +47,7 @@ const handleSubmit : React.FormEventHandler<HTMLFormElement> = async (e) => {
             justifyContent: "center",
           }}
         >
-          <form onSubmit={handleSubmit} sx={{ maxWidth: "780px" } as any}>
+          <Box component="form" onSubmit={handleSubmit} sx={{ maxWidth: "780px" }}>
             <Grid
               item
               xs={12}
@@ -81,10 +78,10 @@ const handleSubmit : React.FormEventHandler<HTMLFormElement> = async (e) => {
                 <AppInput label="Email" value={user.email} />
               </Grid>
               <Grid item xs={6}>
-                <AppInput label="password" type="password" placeholder="******"/>
+                <AppInput label="password" type="password" placeholder="******" />
               </Grid>
               <Grid item xs={6}>
-                <AppInput label="Confirm password" type="password" placeholder="******"/>
+                <AppInput label="Confirm password" type="password" placeholder="******" />
               </Grid>
             </Grid>
             <Grid
@@ -108,7 +105,7 @@ const handleSubmit : React.FormEventHandler<HTMLFormElement> = async (e) => {
                 Save Changes
               </Button>
             </Grid>
-          </form>
+          </Box>
         </Box>
       </Paper>
     </Box>

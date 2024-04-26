@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 import { Box, Dialog, DialogContent, DialogContentText, DialogTitle, IconButton } from "@mui/material";
 
-// import { ReactComponent as CancelSvg } from "../../assets/svg/cancel.svg";
-// import { ReactComponent as TrashSvg } from "../../assets/svg/trash.svg";
+import { ReactComponent as CancelSvg } from "../../assets/svg/cancel.svg";
+import { ReactComponent as TrashSvg } from "../../assets/svg/trash.svg";
 import { Button } from "../button";
 
 interface Props {
@@ -41,12 +41,12 @@ function DeleteDialog({ open, setOpen, numOfRows, onDelete, user, category }: Pr
     >
       <Box position="absolute" top="10px" right="10px">
         <IconButton onClick={handleClose} sx={{ padding: 0 }}>
-          {/* <CancelSvg /> */}
+          <CancelSvg />
         </IconButton>
       </Box>
       <Box padding="36px 40px">
         <DialogTitle id="alert-dialog-title" textAlign="center">
-          {/* <TrashSvg color="warning" fontSize="large" /> */}
+          <TrashSvg color="warning" fontSize="large" />
         </DialogTitle>
         <DialogContent>
           <DialogContentText textAlign="center" id="alert-dialog-description" sx={{ marginBottom: "8px" }} color="secondary" variant="h4">

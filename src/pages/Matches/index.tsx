@@ -26,6 +26,29 @@ interface Link {
   ExternalLink?: string;
 }
 
+type ApiDataType = {
+  league: {
+    name: string
+    events: {
+      _id: string
+      date: Date
+      competitors: {
+        displayName: string
+        logo: string
+      }[]
+      streamingLinks: {
+
+      }[]
+      externalLinks: {
+
+      }[]
+    }[]
+  }
+  logo: {
+    href: string
+  }
+}
+
 function Matches() {
   const Table = styled(DataGrid)`
     & .MuiDataGrid-root {
@@ -39,7 +62,7 @@ function Matches() {
       font-size: 14px !important;
     }
   `;
-  const [data, setData] = React.useState({});
+  const [data, setData] = React.useState<ApiDataType>();
   const [open, setOpen] = React.useState(false);
   const [editModalOpen, setEditModalOpen] = React.useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -76,6 +99,7 @@ function Matches() {
       { label: newLabel, name: "", link: "" },
     ]);
   };
+
   const handleAddExternalLink = () => {
     const newLabel = `External Link ${externalLinks.length + 1}`;
     setExternalLinks((prevExternalLinks) => [
@@ -135,7 +159,6 @@ function Matches() {
         league: data.league,
         date,
       });
-      console.log(response)
       setOpen(false)
       setEditModalOpen(false)
       setData(response.data.data.sport);
@@ -152,7 +175,7 @@ function Matches() {
   }, []);
 
   const rows =
-    data.league?.events?.map((event, idx) => {
+    data?.league?.events?.map((event, idx) => {
       const dateObj = new Date(event.date);
       const formattedDate = dateObj.toLocaleDateString();
       const time = dateObj.toLocaleTimeString([], {
@@ -177,8 +200,6 @@ function Matches() {
         // streamingLinks: event.streamingLinks.map(link => link.href).join(', '),
       };
     }) || [];
-  const link = data.league?.events?.map((val) => val._id);
-
 
   const style = {
     position: "absolute",
@@ -257,14 +278,6 @@ function Matches() {
       headerClassName: styles.headerCell,
       cellClassName: styles.tableCell,
     },
-    // {
-    //   field: "teams",
-    //   headerName: "Teams",
-    //   flex: 1,
-    //   sortable: false,
-    //   headerClassName: styles.headerCell,
-    //   cellClassName: styles.tableCell,
-    // },
     {
       field: "teams",
       headerName: "Teams",
@@ -272,15 +285,7 @@ function Matches() {
       sortable: false,
       headerClassName: styles.headerCell,
       cellClassName: styles.tableCell,
-      renderCell: (params) => (
-        <Box display="flex" alignItems="center">
-          <img src={params.row.homeLogo} alt="Home Team Logo" style={{ width: '30px', height: '30px', marginRight: '10px' }} />
-          <Typography>{params.row.homeTeam} vs </Typography>
-          <img src={params.row.awayLogo} alt="Away Team Logo" style={{ width: '30px', height: '30px', marginLeft: '10px' }} />
-          <Typography>{params.row.awayTeam}</Typography>
-        </Box>
-      ),
-   },
+    },
 
     {
       field: "league",
@@ -298,7 +303,7 @@ function Matches() {
       headerClassName: styles.headerCell,
       cellClassName: styles.tableCell,
       renderCell: (cell) => (
-        <Box>{cell.row.streamingLinks.map(val => val.link).join("")}</Box>
+        <Box>{(cell.row.streamingLinks as any[]).map(val => val.link).join(", ")}</Box>
       )
     },
     {
@@ -309,7 +314,7 @@ function Matches() {
       headerClassName: styles.headerCell,
       cellClassName: styles.tableCell,
       renderCell: (cell) => (
-        <Box>{cell.row.externalLinks.map(val => val.link).join("")}</Box>
+        <Box>{(cell.row.externalLinks as any[]).map(val => val.link).join(", ")}</Box>
       )
     },
     {

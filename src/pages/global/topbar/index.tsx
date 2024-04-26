@@ -6,7 +6,7 @@ import Paper from "@mui/material/Paper";
 import Toolbar from "@mui/material/Toolbar";
 
 // import logo from "../../../assets/img/logoApp.png";
-// import logoSvg from "../../../assets/svg/logoApp.svg";
+import logoSvg from "../../../assets/svg/logoApp.svg";
 import useStore from "../../../store";
 
 import ProfileMenu from "./profileMenu";
@@ -40,7 +40,7 @@ function Header({ className }: Props) {
               columnGap: "150px",
             }}
           >
-            {/* <img src={logoSvg} alt="Logo" /> */}
+            <img src={logoSvg} alt="Logo" />
             <Box sx={{ fontSize: "28px", fontWeight: 600 }}>{title}</Box>
           </Box>
 

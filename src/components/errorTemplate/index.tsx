@@ -1,7 +1,6 @@
 import { Box, Typography, useTheme } from "@mui/material";
-import { tokens } from "../../theme";
 
-// import { tokens } from ".";
+import { tokens } from "../../theme";
 
 interface Props {
   status: number | undefined;

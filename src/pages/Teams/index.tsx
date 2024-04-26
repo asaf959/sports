@@ -1,11 +1,27 @@
 import { Box, InputAdornment, styled } from "@mui/material";
 import PageHeader from "../../components/header";
 import styles from "./style.module.scss";
-import { DataGrid, GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import Input from "../../components/input";
 import SearchIcon from "@mui/icons-material/Search";
 import API_CALL from "../../services";
 import React from "react";
+
+type SportsType = {
+  leagues: {
+    name: string
+    teams: {
+      team: {
+        id: string,
+        displayName: string
+        league: string
+        location: string
+      }
+    }[]
+  }[]
+}
+
+type SportStateType = Omit<SportsType["leagues"][0]["teams"][0]["team"], "displayName" | "location"> & { teams: string, city: string }
 
 function Teams() {
   const Table = styled(DataGrid)`
@@ -20,7 +36,7 @@ function Teams() {
       font-size:14px !important;
     }
   `;
-  const [ data, setData ]= React.useState({})
+  const [data, setData] = React.useState<SportStateType[]>([])
   // const getMatchesForSport = async () => {
   //   try {
   //      const data = JSON.parse(sessionStorage.getItem("sport") || "{}");
@@ -37,31 +53,31 @@ function Teams() {
   //  };
   const getMatchesForSport = async () => {
     try {
-       const data = JSON.parse(sessionStorage.getItem("sport") || "{}");
-       if (!data.sport || !data.league) {
-         console.error("Sport or league not found in sessionStorage");
-         return;
-       }
-       const response = await API_CALL.getTeams({ sport: data.sport, league: data.league });
-       // Assuming response.data.data.sports is the array of sports
-       const sports = response.data.data.sports;
-       const flattenedData = sports.flatMap(sport =>
-         sport.leagues.flatMap(league =>
-           league.teams.map(team => ({
-             id: team.team.id,
-             teams: team.team.displayName,
-             league: league.name,
-             city: team.team.location,
-           }))
-         )
-       );
-   
-       setData(flattenedData);
+      const data = JSON.parse(sessionStorage.getItem("sport") || "{}");
+      if (!data.sport || !data.league) {
+        console.error("Sport or league not found in sessionStorage");
+        return;
+      }
+      const response = await API_CALL.getTeams({ sport: data.sport, league: data.league });
+      // Assuming response.data.data.sports is the array of sports
+      const sports = response.data.data.sports as SportsType[];
+      const flattenedData = sports.flatMap(sport =>
+        sport.leagues.flatMap(league =>
+          league.teams.map(team => ({
+            id: team.team.id,
+            teams: team.team.displayName,
+            league: league.name,
+            city: team.team.location,
+          }))
+        )
+      );
+
+      setData(flattenedData);
     } catch (error) {
-       console.error("Error fetching matches for sport:", error);
+      console.error("Error fetching matches for sport:", error);
     }
-   };
-   
+  };
+
   React.useEffect(() => {
     void getMatchesForSport()
   }, []);
@@ -106,7 +122,7 @@ function Teams() {
       headerName: "LOREM IPSUM",
 
       flex: 1,
-      valueGetter: (params: GridValueGetterParams) =>
+      valueGetter: (params: any) =>
         `Lorem Ipsum ${params.row.id}`, // Value getter based on the ID
       headerClassName: styles.headerClass,
       cellClassName: styles.tableCell,

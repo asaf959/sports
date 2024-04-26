@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { ToastContainer } from "react-toastify";
 
 import { useLoggedIn, useLoggedInUpdate } from "../loggedInContext";
-// import { ColorModeContext, useMode } from "../"
+import { ColorModeContext, useMode } from "../theme";
 import "react-toastify/dist/ReactToastify.css";
 import "./style.scss";
 import { setUser } from "../utils/session";
@@ -12,7 +12,6 @@ import { setUser } from "../utils/session";
 import Router from "./router";
 import API_CALL from "../services";
 import Authentication from "../components/login";
-import {ColorModeContext ,useMode } from "../theme";
 
 function App(): JSX.Element {
   const [theme, colorMode] = useMode();
@@ -43,11 +42,11 @@ function App(): JSX.Element {
     <ColorModeContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-          <ToastContainer />
-          {/* <Authentication /> */}
-          {loginStatus === "loggedout"  && <Authentication />}
+        <ToastContainer />
+        {/* <Authentication /> */}
+        {loginStatus === "loggedout" && <Authentication />}
 
-          {loginStatus === "loggedin" && <Router />}
+        {loginStatus === "loggedin" && <Router />}
       </ThemeProvider>
     </ColorModeContext.Provider>
   );

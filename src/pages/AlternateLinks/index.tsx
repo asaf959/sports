@@ -27,22 +27,13 @@ function AlternateLinks() {
   };
 
   function onChange(idx: number, e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
-    const { name, value } = e.target;
     setLinks(prev => {
-      const arr = [...prev];
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (arr[idx] as any)[name] = value;
-      return arr;
-    });
+      const arr = [...prev]
+      const el = e.target.name as keyof typeof links[0]
+      arr[idx][el] = e.target.value
+      return arr
+    })
   }
-
-  // function onChange(idx: number, e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
-  //   setLinks(prev => {
-  //     const arr = [...prev]
-  //     arr[idx][e.target.name] = e.target.value
-  //     return arr
-  //   })
-  // }
 
   async function createAlternativeLink() {
     try {
