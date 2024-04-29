@@ -19,6 +19,7 @@ import AppInput from "../../components/newInput";
 import AddIcon from "@mui/icons-material/Add";
 import { getSportFromSession } from "../../utils/utils";
 
+
 interface Link {
   label: string;
   name: string;
@@ -28,26 +29,23 @@ interface Link {
 
 type ApiDataType = {
   league: {
-    name: string
+    name: string;
     events: {
-      _id: string
-      date: Date
+      _id: string;
+      date: Date;
       competitors: {
-        displayName: string
-        logo: string
-      }[]
-      streamingLinks: {
-
-      }[]
-      externalLinks: {
-
-      }[]
-    }[]
-  }
+        displayName: string;
+        logo: string;
+      }[];
+      streamingLinks: {}[];
+      externalLinks: {}[];
+    }[];
+  };
   logo: {
-    href: string
-  }
-}
+    href: string;
+  };
+};
+
 
 function Matches() {
   const Table = styled(DataGrid)`
@@ -77,9 +75,7 @@ function Matches() {
     { label: "External Link 1", name: "", ExternalLink: "" },
   ]);
 
-  React.useEffect(() => {
-
-  }, []);
+  React.useEffect(() => {}, []);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleEditOpen = (data: any) => {
@@ -87,10 +83,22 @@ function Matches() {
     setEditModalOpen(true);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    setLinks(data.streamingLinks.map((val: any, idx: number) => ({ label: `Link ${idx + 1}`, name: val.title, link: val.link })))
+    setLinks(
+      data.streamingLinks.map((val: any, idx: number) => ({
+        label: `Link ${idx + 1}`,
+        name: val.title,
+        link: val.link,
+      }))
+    );
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    setExternalLinks(data.externalLinks.map((val: any, idx: number) => ({ label: `External Link ${idx + 1}`, name: val.title, link: val.link })))
-  }
+    setExternalLinks(
+      data.externalLinks.map((val: any, idx: number) => ({
+        label: `External Link ${idx + 1}`,
+        name: val.title,
+        link: val.link,
+      }))
+    );
+  };
 
   const handleAddLink = () => {
     const newLabel = `Link ${links.length + 1}`;
@@ -133,7 +141,12 @@ function Matches() {
     setCurrentDateTime(getCurrentDateTime());
   }, []);
 
-  const handleInputChange = (index: number, field: keyof Link, value: string, externalLink = false) => {
+  const handleInputChange = (
+    index: number,
+    field: keyof Link,
+    value: string,
+    externalLink = false
+  ) => {
     const updatedLinks = [...(externalLink ? externalLinks : links)];
     updatedLinks[index][field] = value;
     if (externalLink) {
@@ -159,8 +172,8 @@ function Matches() {
         league: data.league,
         date,
       });
-      setOpen(false)
-      setEditModalOpen(false)
+      setOpen(false);
+      setEditModalOpen(false);
       setData(response.data.data.sport);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
@@ -220,15 +233,21 @@ function Matches() {
   const addStreamingLinkAndClose = async () => {
     const data = {
       ...getSportFromSession(),
-      streamingLinks: links.map(val => ({ title: val.name, link: val.link as string })),
-      externalLinks: externalLinks.map(val => ({ title: val.name, link: val.link as string })),
-      date: new Date()
+      streamingLinks: links.map((val) => ({
+        title: val.name,
+        link: val.link as string,
+      })),
+      externalLinks: externalLinks.map((val) => ({
+        title: val.name,
+        link: val.link as string,
+      })),
+      date: new Date(),
     };
     try {
       await API_CALL.addStreamingLink(data);
       console.log("Streaming links added successfully");
       setOpen(false);
-      await getMatchesForSport()
+      await getMatchesForSport();
     } catch (error) {
       console.error("Error adding streaming links:", error);
     }
@@ -237,15 +256,21 @@ function Matches() {
   const updateStreamingLinkAndClose = async () => {
     const data = {
       ...getSportFromSession(),
-      streamingLinks: links.map(val => ({ title: val.name, link: val.link as string })),
-      externalLinks: externalLinks.map(val => ({ title: val.name, link: val.link as string })),
-      date: new Date()
+      streamingLinks: links.map((val) => ({
+        title: val.name,
+        link: val.link as string,
+      })),
+      externalLinks: externalLinks.map((val) => ({
+        title: val.name,
+        link: val.link as string,
+      })),
+      date: new Date(),
     };
     try {
       await API_CALL.updateStreamingLink(selectedItem?._id, data);
       console.log("Streaming links updated successfully");
       setOpen(false);
-      await getMatchesForSport()
+      await getMatchesForSport();
     } catch (error) {
       console.error("Error adding streaming links:", error);
     }
@@ -303,8 +328,10 @@ function Matches() {
       headerClassName: styles.headerCell,
       cellClassName: styles.tableCell,
       renderCell: (cell) => (
-        <Box>{(cell.row.streamingLinks as any[]).map(val => val.link).join(", ")}</Box>
-      )
+        <Box>
+          {(cell.row.streamingLinks as any[]).map((val) => val.link).join(", ")}
+        </Box>
+      ),
     },
     {
       field: "externalLinks",
@@ -314,8 +341,10 @@ function Matches() {
       headerClassName: styles.headerCell,
       cellClassName: styles.tableCell,
       renderCell: (cell) => (
-        <Box>{(cell.row.externalLinks as any[]).map(val => val.link).join(", ")}</Box>
-      )
+        <Box>
+          {(cell.row.externalLinks as any[]).map((val) => val.link).join(", ")}
+        </Box>
+      ),
     },
     {
       field: "actions",
@@ -323,8 +352,7 @@ function Matches() {
       align: "center",
       headerAlign: "center",
       renderCell: (cell) => (
-        <Box display="flex">
-          <>
+        <Box display="flex"  height="100%" alignItems={"center"}>
             <IconButton onClick={() => handleEditOpen(cell.row)}>
               <Avatar
                 src={EditIcon}
@@ -332,11 +360,11 @@ function Matches() {
                 sx={{ height: "20px", width: "20px", borderRadius: 0 }}
               />
             </IconButton>
-          </>
         </Box>
       ),
     },
   ];
+
 
   return (
     <Box component="div">
@@ -375,7 +403,8 @@ function Matches() {
           Add Streaming Links
         </Button>
       </Box>
-      {/* <Table
+
+      <Table
         rows={rows}
         columns={columns}
         columnHeaderHeight={54}
@@ -387,6 +416,7 @@ function Matches() {
         }}
         sx={{
           backgroundColor: "#ffff",
+          height: rows.length === 0 ? "200px" : "auto",
         }}
         pageSizeOptions={[5, 10]}
         className={styles.dataGrid}
@@ -394,46 +424,10 @@ function Matches() {
         checkboxSelection
         disableColumnMenu
         disableRowSelectionOnClick
-      /> */}
-
- {rows.length > 0 ? (
-    <Table
-      rows={rows}
-      columns={columns}
-      columnHeaderHeight={54}
-      rowHeight={64}
-      initialState={{
-        pagination: {
-          paginationModel: { page: 0, pageSize: 9 },
-        },
-      }}
-      sx={{
-        backgroundColor: "#ffff",
-      }}
-      pageSizeOptions={[5, 10]}
-      className={styles.dataGrid}
-      disableColumnFilter
-      checkboxSelection
-      disableColumnMenu
-      disableRowSelectionOnClick
-    />
- ) : (
-    <Box
-      display="flex"
-      alignItems="center"
-      justifyContent="center"
-      height="100%"
-      sx={{
-        backgroundColor: "#ffff",
-        minHeight: 400, // Adjust this value based on your layout
-      }}
-    >
-      <Typography variant="h6" color="textSecondary">
-        No data available
-      </Typography>
-    </Box>
- )}
-
+        localeText={{
+          noRowsLabel: "No Data available",
+        }}
+      />
 
       <Modal
         aria-labelledby="transition-modal-title"
@@ -540,7 +534,12 @@ function Matches() {
                             placeholder="HD"
                             value={link.name}
                             onChange={(e) =>
-                              handleInputChange(index, "name", e.target.value, true)
+                              handleInputChange(
+                                index,
+                                "name",
+                                e.target.value,
+                                true
+                              )
                             }
                           />
                         </Box>
@@ -550,7 +549,12 @@ function Matches() {
                             placeholder="https://www.soccerstream1234.com./soccerlive/today/4785478"
                             value={link.link}
                             onChange={(e) =>
-                              handleInputChange(index, "link", e.target.value, true)
+                              handleInputChange(
+                                index,
+                                "link",
+                                e.target.value,
+                                true
+                              )
                             }
                           />
                         </Box>
@@ -634,9 +638,12 @@ function Matches() {
             <Box display={"flex"} alignItems={"center"} columnGap={3}>
               <Typography>{selectedItem?.id}:</Typography>
               <Box display={"flex"} alignItems={"center"} columnGap={2}>
-                <img width={24} src={selectedItem?.homeLogo} alt="logo1" /> {selectedItem?.homeTeam} vs{" "}
-                <img width={24} src={selectedItem?.awayLogo} alt="logo1" /> {selectedItem?.awayTeam}{" "}
-                <img width={24} src={selectedItem?.leagueLogo} alt="logo1" /> {selectedItem?.league} {currentDateTime}
+                <img width={24} src={selectedItem?.homeLogo} alt="logo1" />{" "}
+                {selectedItem?.homeTeam} vs{" "}
+                <img width={24} src={selectedItem?.awayLogo} alt="logo1" />{" "}
+                {selectedItem?.awayTeam}{" "}
+                <img width={24} src={selectedItem?.leagueLogo} alt="logo1" />{" "}
+                {selectedItem?.league} {currentDateTime}
               </Box>
             </Box>
             <Box id="transition-modal-description" sx={{ mt: 2 }}>
@@ -711,7 +718,12 @@ function Matches() {
                             placeholder="HD"
                             value={link.name}
                             onChange={(e) =>
-                              handleInputChange(index, "name", e.target.value, true)
+                              handleInputChange(
+                                index,
+                                "name",
+                                e.target.value,
+                                true
+                              )
                             }
                           />
                         </Box>
@@ -721,7 +733,12 @@ function Matches() {
                             placeholder="https://www.soccerstream1234.com./soccerlive/today/4785478"
                             value={link.link}
                             onChange={(e) =>
-                              handleInputChange(index, "link", e.target.value, true)
+                              handleInputChange(
+                                index,
+                                "link",
+                                e.target.value,
+                                true
+                              )
                             }
                           />
                         </Box>
