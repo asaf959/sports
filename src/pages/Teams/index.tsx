@@ -59,6 +59,7 @@ function Teams() {
         return;
       }
       const response = await API_CALL.getTeams({ sport: data.sport, league: data.league });
+      console.log(response)
       // Assuming response.data.data.sports is the array of sports
       const sports = response.data.data.sports as SportsType[];
       const flattenedData = sports.flatMap(sport =>
@@ -117,16 +118,22 @@ function Teams() {
       headerClassName: styles.headerCell,
       cellClassName: styles.tableCell,
     },
-    {
-      field: "fullName",
-      headerName: "LOREM IPSUM",
+    // {
+    //   field: "fullName",
+    //   headerName: "LOREM IPSUM",
 
-      flex: 1,
-      valueGetter: (params: any) =>
-        `Lorem Ipsum ${params.row.id}`, // Value getter based on the ID
-      headerClassName: styles.headerClass,
-      cellClassName: styles.tableCell,
-    },
+    //   flex: 1,
+    //   // valueGetter: (params: any) =>
+    //   //   `Lorem Ipsum ${params.row.id}`, // Value getter based on the ID
+    //   // headerClassName: styles.headerClass,
+    //   // cellClassName: styles.tableCell,
+    //   valueGetter: (params: any) => {
+    //     if (params && params.row) {
+    //        return `Lorem Ipsum ${params.row.id}`;
+    //     }
+    //     return ''; // Return a default value or an empty string if the row is not available
+    //    },
+    // },
   ];
 
   // const rows = [

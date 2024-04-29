@@ -375,7 +375,7 @@ function Matches() {
           Add Streaming Links
         </Button>
       </Box>
-      <Table
+      {/* <Table
         rows={rows}
         columns={columns}
         columnHeaderHeight={54}
@@ -394,7 +394,46 @@ function Matches() {
         checkboxSelection
         disableColumnMenu
         disableRowSelectionOnClick
-      />
+      /> */}
+
+ {rows.length > 0 ? (
+    <Table
+      rows={rows}
+      columns={columns}
+      columnHeaderHeight={54}
+      rowHeight={64}
+      initialState={{
+        pagination: {
+          paginationModel: { page: 0, pageSize: 9 },
+        },
+      }}
+      sx={{
+        backgroundColor: "#ffff",
+      }}
+      pageSizeOptions={[5, 10]}
+      className={styles.dataGrid}
+      disableColumnFilter
+      checkboxSelection
+      disableColumnMenu
+      disableRowSelectionOnClick
+    />
+ ) : (
+    <Box
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+      height="100%"
+      sx={{
+        backgroundColor: "#ffff",
+        minHeight: 400, // Adjust this value based on your layout
+      }}
+    >
+      <Typography variant="h6" color="textSecondary">
+        No data available
+      </Typography>
+    </Box>
+ )}
+
 
       <Modal
         aria-labelledby="transition-modal-title"

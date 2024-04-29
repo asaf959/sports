@@ -8,12 +8,36 @@ import { getSportFromSession } from "../../utils/utils";
 function Dashboard() {
   const [link, setLink] = useState("");
 
-  async function getMasterLink() {
-    const sportArr = [Object.values(getSportFromSession())[0], Object.values(getSportFromSession())[1]] as const
-    const { data: res } = await API_CALL.getMasterLink(...sportArr)
+  // async function getMasterLink() {
+  //   const sportArr = [Object.values(getSportFromSession())[0], Object.values(getSportFromSession())[1]] as const
+  //   const { data: res } = await API_CALL.getMasterLink(...sportArr)
 
-    setLink(res.data.masterLink.link);
-  }
+  //   setLink(res.data.masterLink.link);
+  // }
+
+  async function getMasterLink() {
+    try {
+       const sportArr = [Object.values(getSportFromSession())[0], Object.values(getSportFromSession())[1]] as const;
+       const { data: res } = await API_CALL.getMasterLink(...sportArr);
+   
+       // Check if the response contains the expected data
+       if (res && res.data && res.data.masterLink && res.data.masterLink.link) {
+         setLink(res.data.masterLink.link);
+       } else {
+         // Handle the case where the master link is not found
+         console.error("Master link could not be found");
+         // Optionally, set an error state or show a message to the user
+       }
+    } catch (error: any) {
+       if (error.response && error.response.data) {
+         console.error("Error fetching master link:", error.response.data.message);
+       } else {
+         console.error("Error fetching master link:", error.message);
+       }
+       // Optionally, set an error state or show a message to the user
+    }
+   }
+   
 
   async function addMasterLink() {
     await API_CALL.addMasterLink({ ...getSportFromSession(), link })
@@ -56,6 +80,7 @@ function Dashboard() {
               placeholder="Enter the link of the Master website of this sport here"
               onChange={handleInputChange}
               value={link}
+              // value={link || "Add link"}
             />
           </Box>
           <Box>
