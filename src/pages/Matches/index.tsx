@@ -303,6 +303,14 @@ function Matches() {
       headerClassName: styles.headerCell,
       cellClassName: styles.tableCell,
     },
+    // {
+    //   field: "teams",
+    //   headerName: "Teams",
+    //   flex: 1,
+    //   sortable: false,
+    //   headerClassName: styles.headerCell,
+    //   cellClassName: styles.tableCell,
+    // },
     {
       field: "teams",
       headerName: "Teams",
@@ -310,7 +318,15 @@ function Matches() {
       sortable: false,
       headerClassName: styles.headerCell,
       cellClassName: styles.tableCell,
-    },
+      renderCell: (params) => (
+        <Box display="flex" alignItems="center">
+          <img src={params.row.homeLogo} alt="Home Team Logo" style={{ width: '30px', height: '30px', marginRight: '10px' }} />
+          <Typography>{params.row.homeTeam} vs </Typography>
+          <img src={params.row.awayLogo} alt="Away Team Logo" style={{ width: '30px', height: '30px', marginLeft: '10px' }} />
+          <Typography>{params.row.awayTeam}</Typography>
+        </Box>
+      ),
+   },
 
     {
       field: "league",
