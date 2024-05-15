@@ -186,11 +186,15 @@ function Teams() {
         }}
         sx={{
           backgroundColor: "#ffff",
+          height: data.length === 0 ? "200px" : "auto",
         }}
         pageSizeOptions={[5, 10]}
         className={styles.dataGrid}
         disableColumnFilter
         disableColumnMenu
+        localeText={{
+          noRowsLabel: "No Data available",
+        }}
       />
     </Box>
   );
