@@ -83,8 +83,8 @@ const handleSportSelection = (sport: string, league: string) => {
           <SportTab
           sport="Tennis"
           league="all"
-          selected={selectedLeague === "all"}
-          onClick={() => handleSportSelection("tennis", "all")}
+          selected={selectedLeague === "tournament"}
+          onClick={() => handleSportSelection("tennis", "tournament")}
           />
           <SportTab
           sport="F1"

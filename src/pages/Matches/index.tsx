@@ -18,6 +18,7 @@ import DateObject from "react-date-object";
 import AppInput from "../../components/newInput";
 import AddIcon from "@mui/icons-material/Add";
 import { getSportFromSession } from "../../utils/utils";
+import notify from "../../utils/notify";
 
 
 interface Link {
@@ -164,7 +165,8 @@ function Matches() {
       const d = new DateObject();
       const date = d.format("MM-DD-YYYY");
       if (!data.sport || !data.league) {
-        console.error("Sport or league not found");
+      notify("error", "Sport or league not found");
+        // console.error("Sport or league not found");
         return;
       }
       const response = await API_CALL.getMatches({
@@ -177,10 +179,12 @@ function Matches() {
       setData(response.data.data.sport);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      console.error(
-        "Error fetching matches for sport:",
-        error.response.data.message
-      );
+    notify("error", error.response.data.message);
+
+      // console.error(
+      //   "Error fetching matches for sport:",
+      //   error.response.data.message
+      // );
     }
   };
   React.useEffect(() => {
@@ -245,11 +249,13 @@ function Matches() {
     };
     try {
       await API_CALL.addStreamingLink(data);
-      console.log("Streaming links added successfully");
+      notify("success", "Streaming links added successfully");
+      // console.log("Streaming links added successfully");
       setOpen(false);
       await getMatchesForSport();
     } catch (error) {
-      console.error("Error adding streaming links:", error);
+      notify("error", "Error adding streaming links");
+      // console.error("Error adding streaming links:", error);
     }
   };
 
@@ -268,11 +274,13 @@ function Matches() {
     };
     try {
       await API_CALL.updateStreamingLink(selectedItem?._id, data);
-      console.log("Streaming links updated successfully");
+      // console.log("Streaming links updated successfully");
+      notify("success", "Streaming links updated successfully");
       setOpen(false);
       await getMatchesForSport();
     } catch (error) {
-      console.error("Error adding streaming links:", error);
+      notify("error", "Error updating streaming links");
+      // console.error("Error adding streaming links:", error);
     }
   };
 
@@ -290,7 +298,7 @@ function Matches() {
     {
       field: "date",
       headerName: "Date",
-      flex: 1,
+      width: 100,
       sortable: false,
       headerClassName: styles.headerCell,
       cellClassName: styles.tableCell,
@@ -298,7 +306,7 @@ function Matches() {
     {
       field: "time",
       headerName: "Time",
-      flex: 1,
+      width: 100,
       sortable: false,
       headerClassName: styles.headerCell,
       cellClassName: styles.tableCell,
@@ -312,26 +320,27 @@ function Matches() {
     //   cellClassName: styles.tableCell,
     // },
     {
-      field: "teams",
-      headerName: "Teams",
+      field: "matches",
+      headerName: "Matches",
       flex: 1,
       sortable: false,
       headerClassName: styles.headerCell,
       cellClassName: styles.tableCell,
       renderCell: (params) => (
         <Box display="flex" alignItems="center">
-          <img src={params.row.homeLogo} alt="Home Team Logo" style={{ width: '30px', height: '30px', marginRight: '10px' }} />
-          <Typography>{params.row.homeTeam} vs </Typography>
-          <img src={params.row.awayLogo} alt="Away Team Logo" style={{ width: '30px', height: '30px', marginLeft: '10px' }} />
-          <Typography>{params.row.awayTeam}</Typography>
-        </Box>
+      <Typography style={{ marginRight: '10px' }}>{params.row.homeTeam}</Typography>
+      <img src={params.row.homeLogo} alt="Home Team Logo" style={{ width: '30px', height: '30px', marginRight: '10px' }} />
+      <Typography style={{ marginRight: '10px' }}>vs</Typography>
+      <img src={params.row.awayLogo} alt="Away Team Logo" style={{ width: '30px', height: '30px', marginRight: '10px' }} />
+      <Typography>{params.row.awayTeam}</Typography>
+    </Box>
       ),
    },
 
     {
       field: "league",
       headerName: "League",
-      flex: 1,
+      width: 180,
       sortable: false,
       headerClassName: styles.headerCell,
       cellClassName: styles.tableCell,
@@ -339,7 +348,7 @@ function Matches() {
     {
       field: "streamingLinks",
       headerName: "Link 1",
-      flex: 1,
+      width: 180,
       sortable: false,
       headerClassName: styles.headerCell,
       cellClassName: styles.tableCell,
@@ -352,7 +361,7 @@ function Matches() {
     {
       field: "externalLinks",
       headerName: "Link 2",
-      flex: 1,
+      width: 180,
       sortable: false,
       headerClassName: styles.headerCell,
       cellClassName: styles.tableCell,
