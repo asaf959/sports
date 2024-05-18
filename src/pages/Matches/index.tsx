@@ -158,8 +158,7 @@ function Matches() {
   };
 
   const handleOpen = () => setOpen(true);
-
-  const getMatchesForSport = async () => {
+const getMatchesForSport = async () => {
     try {
       const data = getSportFromSession();
       const d = new DateObject();
@@ -187,11 +186,12 @@ function Matches() {
       // );
     }
   };
+
   React.useEffect(() => {
     void getMatchesForSport();
   }, []);
-
-  const rows =
+console.log(data)
+const rows =
     data?.league?.events?.map((event, idx) => {
       const dateObj = new Date(event.date);
       const formattedDate = dateObj.toLocaleDateString();
@@ -199,7 +199,8 @@ function Matches() {
         hour: "2-digit",
         minute: "2-digit",
       });
-
+const isUFC = data.league.slug.toLowerCase() === 'ufc';
+console.log(isUFC)
       return {
         _id: event._id,
         id: idx + 1,
@@ -207,8 +208,8 @@ function Matches() {
         time: time,
         homeTeam: event.competitors[0].displayName,
         awayTeam: event.competitors[1].displayName,
-        homeLogo: event.competitors[0].logo,
-        awayLogo: event.competitors[1].logo,
+        homeLogo: isUFC ? event.competitors[0].headshot : event.competitors[0].logo,
+      awayLogo: isUFC ? event.competitors[1].headshot : event.competitors[1].logo,
         leagueLogo: data.logo.href,
         teams: `${event.competitors[0].displayName} vs ${event.competitors[1].displayName}`,
         league: data.league.name,
@@ -217,6 +218,7 @@ function Matches() {
         // streamingLinks: event.streamingLinks.map(link => link.href).join(', '),
       };
     }) || [];
+
 
   const style = {
     position: "absolute",
