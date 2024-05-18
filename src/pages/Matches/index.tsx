@@ -31,6 +31,7 @@ interface Link {
 type ApiDataType = {
   league: {
     name: string;
+    slug: string;
     events: {
       _id: string;
       date: Date;
@@ -39,6 +40,7 @@ type ApiDataType = {
       competitors: {
         displayName: string;
         logo: string;
+        headshot: string
       }[];
       streamingLinks: {}[];
       externalLinks: {}[];
@@ -204,6 +206,8 @@ function Matches() {
         minute: "2-digit",
       });
 
+      const isUFC = data.league.slug.toLowerCase() === 'ufc';
+
       return {
         _id: event._id,
         id: idx + 1,
@@ -211,8 +215,8 @@ function Matches() {
         time: time,
         homeTeam: event?.competitors?.length ? event.competitors[0].displayName :[],
         awayTeam: event?.competitors?.length ? event.competitors[1].displayName :[],
-        homeLogo: event?.competitors?.length ? event.competitors[0].logo  :[],
-        awayLogo: event?.competitors ? event.competitors[1].logo :[],
+        homeLogo: isUFC ? event?.competitors?.length ? event.competitors[0].headshot  :[]  : event?.competitors?.length ? event.competitors[0].logo  :[],
+        awayLogo: isUFC ? event?.competitors ? event.competitors[1].headshot :[]  :event?.competitors ? event.competitors[1].logo :[],
         leagueLogo: data.logo.href,
         description: event.description + " " + event.note,
         teams: `${event?.competitors? event.competitors[0].displayName : ""} vs ${event?.competitors? event.competitors[1].displayName : ""}`,
