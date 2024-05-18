@@ -34,6 +34,8 @@ type ApiDataType = {
     events: {
       _id: string;
       date: Date;
+      description?: string
+      note?: string
       competitors: {
         displayName: string;
         logo: string;
@@ -191,6 +193,8 @@ function Matches() {
     void getMatchesForSport();
   }, []);
 
+  console.log(data)
+
   const rows =
     data?.league?.events?.map((event, idx) => {
       const dateObj = new Date(event.date);
@@ -205,12 +209,13 @@ function Matches() {
         id: idx + 1,
         date: formattedDate,
         time: time,
-        homeTeam: event.competitors[0].displayName,
-        awayTeam: event.competitors[1].displayName,
-        homeLogo: event.competitors[0].logo,
-        awayLogo: event.competitors[1].logo,
+        homeTeam: event?.competitors?.length ? event.competitors[0].displayName :[],
+        awayTeam: event?.competitors?.length ? event.competitors[1].displayName :[],
+        homeLogo: event?.competitors?.length ? event.competitors[0].logo  :[],
+        awayLogo: event?.competitors ? event.competitors[1].logo :[],
         leagueLogo: data.logo.href,
-        teams: `${event.competitors[0].displayName} vs ${event.competitors[1].displayName}`,
+        description: event.description + " " + event.note,
+        teams: `${event?.competitors? event.competitors[0].displayName : ""} vs ${event?.competitors? event.competitors[1].displayName : ""}`,
         league: data.league.name,
         streamingLinks: event.streamingLinks,
         externalLinks: event.externalLinks,
@@ -320,20 +325,22 @@ function Matches() {
     //   cellClassName: styles.tableCell,
     // },
     {
-      field: "matches",
+      field: "description",
       headerName: "Matches",
       flex: 1,
       sortable: false,
       headerClassName: styles.headerCell,
       cellClassName: styles.tableCell,
       renderCell: (params) => (
+        getSportFromSession().league === "f1" ?
+        params.row.description :
         <Box display="flex" alignItems="center">
-      <Typography style={{ marginRight: '10px' }}>{params.row.homeTeam}</Typography>
-      <img src={params.row.homeLogo} alt="Home Team Logo" style={{ width: '30px', height: '30px', marginRight: '10px' }} />
-      <Typography style={{ marginRight: '10px' }}>vs</Typography>
-      <img src={params.row.awayLogo} alt="Away Team Logo" style={{ width: '30px', height: '30px', marginRight: '10px' }} />
-      <Typography>{params.row.awayTeam}</Typography>
-    </Box>
+          <Typography style={{ marginRight: '10px' }}>{params.row.homeTeam}</Typography>
+          <img src={params.row.homeLogo} alt="Home Team Logo" style={{ width: '30px', height: '30px', marginRight: '10px' }} />
+          <Typography style={{ marginRight: '10px' }}>vs</Typography>
+          <img src={params.row.awayLogo} alt="Away Team Logo" style={{ width: '30px', height: '30px', marginRight: '10px' }} />
+          <Typography>{params.row.awayTeam}</Typography>
+        </Box>
       ),
    },
 
