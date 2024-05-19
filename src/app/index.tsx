@@ -12,6 +12,9 @@ import { setUser } from "../utils/session";
 import Router from "./router";
 import API_CALL from "../services";
 import Authentication from "../components/login";
+import { LocalizationProvider } from '@mui/x-date-pickers';
+
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 
 function App(): JSX.Element {
   const [theme, colorMode] = useMode();
@@ -42,11 +45,13 @@ function App(): JSX.Element {
     <ColorModeContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <ToastContainer />
-        {/* <Authentication /> */}
-        {loginStatus === "loggedout" && <Authentication />}
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <ToastContainer />
+          {/* <Authentication /> */}
+          {loginStatus === "loggedout" && <Authentication />}
 
-        {loginStatus === "loggedin" && <Router />}
+          {loginStatus === "loggedin" && <Router />}
+        </LocalizationProvider>
       </ThemeProvider>
     </ColorModeContext.Provider>
   );

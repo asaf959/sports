@@ -19,6 +19,8 @@ import AppInput from "../../components/newInput";
 import AddIcon from "@mui/icons-material/Add";
 import { getSportFromSession } from "../../utils/utils";
 import notify from "../../utils/notify";
+import { DateTimePicker } from "@mui/x-date-pickers";
+import dayjs from "dayjs";
 
 
 interface Link {
@@ -98,9 +100,15 @@ function Matches() {
   const [editModalOpen, setEditModalOpen] = React.useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [selectedItem, setSelectedItem] = React.useState<any>();
-  const [selectedItemMatch, setSelectedItemMatch] = React.useState({
+  type MatchData = {
+    homeTeam: string
+    awayTeam: string
+    date: Date
+  }
+  const [matchData, setMatchData] = React.useState<MatchData>({
     homeTeam: "",
     awayTeam: "",
+    date: new Date()
   });
   const handleEditClose = () => setEditModalOpen(false);
 
@@ -112,18 +120,22 @@ function Matches() {
     { label: "External Link 1", name: "", ExternalLink: "" },
   ]);
 
-  const [matchdata, setMatchData] = React.useState<SportStateType[]>([])
+  const [teamData, setTeamData] = React.useState<SportStateType[]>([])
 
-  React.useEffect(() => {}, []);
+  const matchDate = dayjs(matchData.date);
 
   const handleChange: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = (e) => {
-    console.log(e.target.value);
-    
-    setSelectedItemMatch(prev => ({ ...prev, [e.target.name]: e.target.value }))
+    setMatchData(prev => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
-  console.log(selectedItemMatch);
-  
+  const handleDateChange = (e: dayjs.Dayjs | null) => {
+    if (e) {
+      const date = new Date(`${e.month()}-${e.date()}-${e.year()} ${e.hour()}:${e.minute()}`);
+      console.log(date);
+      setMatchData(prev => ({ ...prev, date: date }))
+    }
+  }
+
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleEditOpen = (data: any) => {
@@ -206,13 +218,13 @@ function Matches() {
 
   const handleOpen = () => setOpen(true);
   const handleOpenMatch = () => setOpenMatch(true);
-const getMatchesForSport = async () => {
+  const getMatchesForSport = async () => {
     try {
       const data = getSportFromSession();
       const d = new DateObject();
       const date = d.format("MM-DD-YYYY");
       if (!data.sport || !data.league) {
-      notify("error", "Sport or league not found");
+        notify("error", "Sport or league not found");
         // console.error("Sport or league not found");
         return;
       }
@@ -227,7 +239,7 @@ const getMatchesForSport = async () => {
       setData(response.data.data.sport);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-    notify("error", error.response.data.message);
+      notify("error", error.response.data.message);
 
       // console.error(
       //   "Error fetching matches for sport:",
@@ -244,7 +256,6 @@ const getMatchesForSport = async () => {
         return;
       }
       const response = await API_CALL.getTeams({ sport: data.sport, league: data.league });
-      console.log(response)
       // Assuming response.data.data.sports is the array of sports
       const sports = response.data.data.sports as SportsType[];
       const flattenedData = sports.flatMap(sport =>
@@ -266,21 +277,19 @@ const getMatchesForSport = async () => {
           }))
         )
       );
-      setMatchData(flattenedData);
+      setTeamData(flattenedData);
     } catch (error) {
       console.error("Error fetching matches for sport:", error);
     }
   };
 
-  console.log(matchdata);
-  
 
   React.useEffect(() => {
     void getMatchesForSport();
     void getTeamsForSport();
   }, []);
 
-const rows =
+  const rows =
     data?.league?.events?.map((event, idx) => {
       const dateObj = new Date(event.date);
       const formattedDate = dateObj.toLocaleDateString();
@@ -295,13 +304,13 @@ const rows =
         id: idx + 1,
         date: formattedDate,
         time: time,
-        homeTeam: event?.competitors?.length ? event.competitors[0].displayName :[],
-        awayTeam: event?.competitors?.length ? event.competitors[1].displayName :[],
-        homeLogo: isUFC ? event?.competitors?.length ? event.competitors[0].headshot  :[]  : event?.competitors?.length ? event.competitors[0]?.logo  :[],
-        awayLogo: isUFC ? event?.competitors ? event.competitors[1].headshot :[]  :event?.competitors ? event.competitors[1]?.logo :[],
+        homeTeam: event?.competitors?.length ? event.competitors[0].displayName : [],
+        awayTeam: event?.competitors?.length ? event.competitors[1].displayName : [],
+        homeLogo: isUFC ? event?.competitors?.length ? event.competitors[0].headshot : [] : event?.competitors?.length ? event.competitors[0]?.logo : [],
+        awayLogo: isUFC ? event?.competitors ? event.competitors[1].headshot : [] : event?.competitors ? event.competitors[1]?.logo : [],
         leagueLogo: data.logo.href,
         description: event.description + " " + event.note,
-        teams: `${event?.competitors? event.competitors[0].displayName : ""} vs ${event?.competitors? event.competitors[1].displayName : ""}`,
+        teams: `${event?.competitors ? event.competitors[0].displayName : ""} vs ${event?.competitors ? event.competitors[1].displayName : ""}`,
         league: data.league.name,
         streamingLinks: event.streamingLinks,
         externalLinks: event.externalLinks,
@@ -421,16 +430,16 @@ const rows =
       cellClassName: styles.tableCell,
       renderCell: (params) => (
         getSportFromSession().league === "f1" ?
-        params.row.description :
-        <Box display="flex" alignItems="center">
-          <Typography style={{ marginRight: '10px' }}>{params.row.homeTeam}</Typography>
-          <img src={params.row.homeLogo} alt="Home Team Logo" style={{ width: '30px', height: '30px', marginRight: '10px' }} />
-          <Typography style={{ marginRight: '10px' }}>vs</Typography>
-          <img src={params.row.awayLogo} alt="Away Team Logo" style={{ width: '30px', height: '30px', marginRight: '10px' }} />
-          <Typography>{params.row.awayTeam}</Typography>
-        </Box>
+          params.row.description :
+          <Box display="flex" alignItems="center" height="100%">
+            <Typography fontSize="13px" style={{ marginRight: '10px' }}>{params.row.homeTeam}</Typography>
+            <img src={params.row.homeLogo} alt="Home Team Logo" style={{ width: '30px', height: '30px', marginRight: '10px' }} />
+            <Typography fontSize="13px" style={{ marginRight: '10px' }}>vs</Typography>
+            <img src={params.row.awayLogo} alt="Away Team Logo" style={{ width: '30px', height: '30px', marginRight: '10px' }} />
+            <Typography fontSize="13px">{params.row.awayTeam}</Typography>
+          </Box>
       ),
-   },
+    },
 
     {
       field: "league",
@@ -472,14 +481,14 @@ const rows =
       align: "center",
       headerAlign: "center",
       renderCell: (cell) => (
-        <Box display="flex"  height="100%" alignItems={"center"}>
-            <IconButton onClick={() => handleEditOpen(cell.row)}>
-              <Avatar
-                src={EditIcon}
-                alt="edit Icon"
-                sx={{ height: "20px", width: "20px", borderRadius: 0 }}
-              />
-            </IconButton>
+        <Box display="flex" height="100%" alignItems={"center"}>
+          <IconButton onClick={() => handleEditOpen(cell.row)}>
+            <Avatar
+              src={EditIcon}
+              alt="edit Icon"
+              sx={{ height: "20px", width: "20px", borderRadius: 0 }}
+            />
+          </IconButton>
         </Box>
       ),
     },
@@ -487,46 +496,44 @@ const rows =
 
 
   const addMatches = async () => {
-    const randomId = Math.random().toString().slice(2,12);
-    const competitors = matchdata.filter(team => team.slug === selectedItemMatch.homeTeam || team.slug === selectedItemMatch.awayTeam).map(team => {
+    const randomId = Math.random().toString().slice(2, 12);
+    const competitors = teamData.filter(team => team.slug === matchData.homeTeam || team.slug === matchData.awayTeam).map(team => {
       const logo = typeof team.logos === "object" ? (team.logos.length > 3 ? team.logos[2] : team.logos[0]) : team.logos
       delete team.links
       delete team.logos
-      return {...team, logo: logo.href, displayName: team.teams}
+      return { ...team, logo: logo.href, displayName: team.teams }
     })
-      try {
-        const data = getSportFromSession();
-        const d = new DateObject();
-        const date = d.format("MM-DD-YYYY");
-        if (!data.sport || !data.league) {
+    try {
+      const data = getSportFromSession();
+      if (!data.sport || !data.league) {
         notify("error", "Sport or league not found");
-          // console.error("Sport or league not found");
-          return;
-        }
-        const response = await API_CALL.addMatches({
-          sport: data.sport,
-          league: data.league,
-          date: new Date(date),
-          isLocal: true,
-          matchId: randomId,
-          eventId: randomId,
-          competitors
-        });
-        setOpenMatch(false)
-        setData(response.data.data.sport);
-        void getMatchesForSport();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (error: any) {
-      notify("error", error.response.data.message);
-  
-        // console.error(
-        //   "Error fetching matches for sport:",
-        //   error.response.data.message
-        // );
+        // console.error("Sport or league not found");
+        return;
       }
-    };
+      const response = await API_CALL.addMatches({
+        sport: data.sport,
+        league: data.league,
+        date: matchData.date,
+        isLocal: true,
+        matchId: randomId,
+        eventId: randomId,
+        competitors
+      });
+      setOpenMatch(false)
+      setData(response.data.data.sport);
+      void getMatchesForSport();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      notify("error", error.response.data.message);
 
-    const options = matchdata.map(match => ({...match, label: match.teams, value:match.slug}))
+      // console.error(
+      //   "Error fetching matches for sport:",
+      //   error.response.data.message
+      // );
+    }
+  };
+
+  const options = teamData.map(match => ({ ...match, label: match.teams, value: match.slug }))
 
 
   return (
@@ -562,6 +569,7 @@ const rows =
           title="Add Matches"
           variant="contained"
           onClick={handleOpenMatch}
+          sx={{ marginRight: 2 }}
         >
           Add Matches
         </Button>
@@ -633,27 +641,45 @@ const rows =
             </Typography>
             <Box id="transition-modal-description">
               <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-          }}
-        >
-          <Box
-            sx={{ maxWidth: "780px", width: "100%" }}
-          >
-            <Grid container spacing={2}>
-              <Grid item xs={6}>
-                <AppInput label="Home Team" selectOptions={options} name="homeTeam" onChange={handleChange} value={selectedItemMatch.homeTeam} />
-              </Grid>
-              <Grid item xs={6}>
-                <AppInput label="Away Team" selectOptions={options} name="awayTeam" onChange={handleChange} value={selectedItemMatch.awayTeam} />
-              </Grid>
-              <Grid item xs={6}>
-                <AppInput label="Description" name="description" value="" />
-              </Grid>
-            </Grid>
-          </Box>
-        </Box>
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                <Box
+                  sx={{ maxWidth: "780px", width: "100%" }}
+                >
+                  <Grid container spacing={2}>
+                    <Grid item xs={6}>
+                      <DateTimePicker
+                        label="Select a Sport"
+                        defaultValue={matchDate}
+                        sx={{
+                          width: "100%",
+                          height: "52px",
+                          backgroundColor: "#F5F6FA",
+                          border: "0.4px solid #D5D5D5",
+                          fontSize: "14px",
+                          fontWeight: 400,
+                          borderRadius: "4px",
+                          marginTop: "11px",
+                          outline: "none",
+                        }}
+                        onChange={(e) => handleDateChange(e)}
+                      />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <AppInput label="Home Team" selectOptions={options} name="homeTeam" onChange={handleChange} value={matchData.homeTeam} />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <AppInput label="Away Team" selectOptions={options} name="awayTeam" onChange={handleChange} value={matchData.awayTeam} />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <AppInput label="Description" name="description" value="" />
+                    </Grid>
+                  </Grid>
+                </Box>
+              </Box>
 
               <Box
                 sx={{
