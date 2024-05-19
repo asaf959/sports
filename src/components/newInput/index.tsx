@@ -12,7 +12,7 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 type Option = {
   value: string;
   label: string;
-}
+} & any
 
 interface Props {
   label: string;

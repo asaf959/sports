@@ -1,4 +1,4 @@
-import { Avatar, Box, Divider, InputAdornment, styled } from "@mui/material";
+import { Avatar, Box, Divider, Grid, InputAdornment, styled } from "@mui/material";
 import PageHeader from "../../components/header";
 import styles from "./style.module.scss";
 import * as React from "react";
@@ -51,6 +51,33 @@ type ApiDataType = {
   };
 };
 
+type SportsType = {
+  leagues: {
+    name: string
+    teams: {
+      team: {
+        id: string,
+        displayName: string
+        league: string
+        location: string
+        abbreviation: string
+        alternateColor: string
+        color: string
+        isActive: boolean
+        isAllStar: boolean
+        name: string
+        nickname: string
+        slug: string
+        links?: any
+        logos?: any
+      }
+    }[]
+  }[]
+}
+
+type SportStateType = Omit<SportsType["leagues"][0]["teams"][0]["team"], "displayName" | "location"> & { teams: string, city: string }
+
+
 
 function Matches() {
   const Table = styled(DataGrid)`
@@ -67,9 +94,14 @@ function Matches() {
   `;
   const [data, setData] = React.useState<ApiDataType>();
   const [open, setOpen] = React.useState(false);
+  const [openMatch, setOpenMatch] = React.useState(false);
   const [editModalOpen, setEditModalOpen] = React.useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [selectedItem, setSelectedItem] = React.useState<any>();
+  const [selectedItemMatch, setSelectedItemMatch] = React.useState({
+    homeTeam: "",
+    awayTeam: "",
+  });
   const handleEditClose = () => setEditModalOpen(false);
 
   const [links, setLinks] = React.useState<Link[]>([
@@ -80,7 +112,18 @@ function Matches() {
     { label: "External Link 1", name: "", ExternalLink: "" },
   ]);
 
+  const [matchdata, setMatchData] = React.useState<SportStateType[]>([])
+
   React.useEffect(() => {}, []);
+
+  const handleChange: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = (e) => {
+    console.log(e.target.value);
+    
+    setSelectedItemMatch(prev => ({ ...prev, [e.target.name]: e.target.value }))
+  }
+
+  console.log(selectedItemMatch);
+  
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleEditOpen = (data: any) => {
@@ -162,6 +205,7 @@ function Matches() {
   };
 
   const handleOpen = () => setOpen(true);
+  const handleOpenMatch = () => setOpenMatch(true);
 const getMatchesForSport = async () => {
     try {
       const data = getSportFromSession();
@@ -179,6 +223,7 @@ const getMatchesForSport = async () => {
       });
       setOpen(false);
       setEditModalOpen(false);
+      setOpenMatch(false)
       setData(response.data.data.sport);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
@@ -191,8 +236,48 @@ const getMatchesForSport = async () => {
     }
   };
 
+  const getTeamsForSport = async () => {
+    try {
+      const data = JSON.parse(sessionStorage.getItem("sport") || "{}");
+      if (!data.sport || !data.league) {
+        console.error("Sport or league not found in sessionStorage");
+        return;
+      }
+      const response = await API_CALL.getTeams({ sport: data.sport, league: data.league });
+      console.log(response)
+      // Assuming response.data.data.sports is the array of sports
+      const sports = response.data.data.sports as SportsType[];
+      const flattenedData = sports.flatMap(sport =>
+        sport.leagues.flatMap(league =>
+          league.teams.map(team => ({
+            id: team.team.id,
+            teams: team.team.displayName,
+            league: league.name,
+            city: team.team.location,
+            abbreviation: team.team.abbreviation,
+            alternateColor: team.team.alternateColor,
+            color: team.team.color,
+            isActive: team.team.isActive,
+            isAllStar: team.team.isAllStar,
+            name: team.team.name,
+            nickname: team.team.nickname,
+            slug: team.team.slug,
+            logos: team.team.logos
+          }))
+        )
+      );
+      setMatchData(flattenedData);
+    } catch (error) {
+      console.error("Error fetching matches for sport:", error);
+    }
+  };
+
+  console.log(matchdata);
+  
+
   React.useEffect(() => {
     void getMatchesForSport();
+    void getTeamsForSport();
   }, []);
 
 const rows =
@@ -212,8 +297,8 @@ const rows =
         time: time,
         homeTeam: event?.competitors?.length ? event.competitors[0].displayName :[],
         awayTeam: event?.competitors?.length ? event.competitors[1].displayName :[],
-        homeLogo: isUFC ? event?.competitors?.length ? event.competitors[0].headshot  :[]  : event?.competitors?.length ? event.competitors[0].logo  :[],
-        awayLogo: isUFC ? event?.competitors ? event.competitors[1].headshot :[]  :event?.competitors ? event.competitors[1].logo :[],
+        homeLogo: isUFC ? event?.competitors?.length ? event.competitors[0].headshot  :[]  : event?.competitors?.length ? event.competitors[0]?.logo  :[],
+        awayLogo: isUFC ? event?.competitors ? event.competitors[1].headshot :[]  :event?.competitors ? event.competitors[1]?.logo :[],
         leagueLogo: data.logo.href,
         description: event.description + " " + event.note,
         teams: `${event?.competitors? event.competitors[0].displayName : ""} vs ${event?.competitors? event.competitors[1].displayName : ""}`,
@@ -239,6 +324,7 @@ const rows =
 
   const handleClose = async () => {
     setOpen(false);
+    setOpenMatch(false)
   };
 
   const addStreamingLinkAndClose = async () => {
@@ -400,6 +486,49 @@ const rows =
   ];
 
 
+  const addMatches = async () => {
+    const randomId = Math.random().toString().slice(2,12);
+    const competitors = matchdata.filter(team => team.slug === selectedItemMatch.homeTeam || team.slug === selectedItemMatch.awayTeam).map(team => {
+      const logo = typeof team.logos === "object" ? (team.logos.length > 3 ? team.logos[2] : team.logos[0]) : team.logos
+      delete team.links
+      delete team.logos
+      return {...team, logo: logo.href, displayName: team.teams}
+    })
+      try {
+        const data = getSportFromSession();
+        const d = new DateObject();
+        const date = d.format("MM-DD-YYYY");
+        if (!data.sport || !data.league) {
+        notify("error", "Sport or league not found");
+          // console.error("Sport or league not found");
+          return;
+        }
+        const response = await API_CALL.addMatches({
+          sport: data.sport,
+          league: data.league,
+          date: new Date(date),
+          isLocal: true,
+          matchId: randomId,
+          eventId: randomId,
+          competitors
+        });
+        setOpenMatch(false)
+        setData(response.data.data.sport);
+        void getMatchesForSport();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
+      notify("error", error.response.data.message);
+  
+        // console.error(
+        //   "Error fetching matches for sport:",
+        //   error.response.data.message
+        // );
+      }
+    };
+
+    const options = matchdata.map(match => ({...match, label: match.teams, value:match.slug}))
+
+
   return (
     <Box component="div">
       <PageHeader title="Matches" />
@@ -429,6 +558,13 @@ const rows =
             ),
           }}
         />
+        <Button
+          title="Add Matches"
+          variant="contained"
+          onClick={handleOpenMatch}
+        >
+          Add Matches
+        </Button>
         <Button
           title="Add Streaming Links"
           variant="contained"
@@ -462,6 +598,91 @@ const rows =
           noRowsLabel: "No Data available",
         }}
       />
+      <Modal
+        aria-labelledby="transition-modal-title"
+        aria-describedby="transition-modal-description"
+        open={openMatch}
+        onClose={handleClose}
+        closeAfterTransition
+        slots={{ backdrop: Backdrop }}
+        slotProps={{
+          backdrop: {
+            timeout: 500,
+          },
+        }}
+        sx={{
+          "& .css-vtbemp": {
+            borderRadius: "24px",
+            borderColor: "transparent",
+            width: "60%",
+            maxHeight: "85%",
+            overflow: "auto",
+            p: "32px",
+          },
+        }}
+      >
+        <Fade in={openMatch}>
+          <Box sx={style}>
+            <Typography
+              id="transition-modal-title"
+              variant="h2"
+              component="h2"
+              sx={{ fontWeight: 600, mb: 4, textAlign: "center" }}
+            >
+              Add Matches
+            </Typography>
+            <Box id="transition-modal-description">
+              <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          <Box
+            sx={{ maxWidth: "780px", width: "100%" }}
+          >
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <AppInput label="Home Team" selectOptions={options} name="homeTeam" onChange={handleChange} value={selectedItemMatch.homeTeam} />
+              </Grid>
+              <Grid item xs={6}>
+                <AppInput label="Away Team" selectOptions={options} name="awayTeam" onChange={handleChange} value={selectedItemMatch.awayTeam} />
+              </Grid>
+              <Grid item xs={6}>
+                <AppInput label="Description" name="description" value="" />
+              </Grid>
+            </Grid>
+          </Box>
+        </Box>
+
+              <Box
+                sx={{
+                  display: "flex",
+                  columnGap: 1,
+                  mt: 2,
+                  pb: 2,
+                  float: "right",
+                }}
+              >
+                <Button
+                  title="Add Streaming Links"
+                  variant="outlined"
+                  onClick={handleClose}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  title="Add Streaming Links"
+                  variant="contained"
+                  onClick={addMatches}
+                >
+                  Apply now
+                </Button>
+              </Box>
+            </Box>
+          </Box>
+        </Fade>
+      </Modal>
 
       <Modal
         aria-labelledby="transition-modal-title"
