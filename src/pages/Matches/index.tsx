@@ -650,21 +650,25 @@ function Matches() {
                   sx={{ maxWidth: "780px", width: "100%" }}
                 >
                   <Grid container spacing={2}>
-                    <Grid item xs={6}>
+                    <Grid item xs={6} >
                       <DateTimePicker
                         label="Select a Sport"
                         defaultValue={matchDate}
                         sx={{
                           width: "100%",
-                          height: "52px",
+                          height: "53px",
                           backgroundColor: "#F5F6FA",
                           border: "0.4px solid #D5D5D5",
                           fontSize: "14px",
                           fontWeight: 400,
                           borderRadius: "4px",
-                          marginTop: "11px",
+                          marginTop: "28px",
                           outline: "none",
+                          "& .MuiInputBase-input.MuiOutlinedInput-input": {
+                            height: "20px"
+                          }
                         }}
+                        
                         onChange={(e) => handleDateChange(e)}
                       />
                     </Grid>
