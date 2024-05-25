@@ -8,6 +8,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import { Button } from "../../components/button";
 import Backdrop from "@mui/material/Backdrop";
 import EditIcon from "../../assets/svg/edit.svg";
+import TrashIcon from "../../assets/svg/trash.svg";
 
 import IconButton from "../../components/iconButton";
 import Modal from "@mui/material/Modal";
@@ -44,6 +45,7 @@ type ApiDataType = {
         logo: string;
         headshot: string
       }[];
+      isLocal: boolean
       streamingLinks: {}[];
       externalLinks: {}[];
     }[];
@@ -79,8 +81,6 @@ type SportsType = {
 
 type SportStateType = Omit<SportsType["leagues"][0]["teams"][0]["team"], "displayName" | "location"> & { teams: string, city: string }
 
-
-
 function Matches() {
   const Table = styled(DataGrid)`
     & .MuiDataGrid-root {
@@ -103,6 +103,8 @@ function Matches() {
   type MatchData = {
     homeTeam: string
     awayTeam: string
+    description?: string
+    note?: string
     date: Date
   }
   const [matchData, setMatchData] = React.useState<MatchData>({
@@ -135,7 +137,6 @@ function Matches() {
       setMatchData(prev => ({ ...prev, date: date }))
     }
   }
-
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleEditOpen = (data: any) => {
@@ -236,6 +237,8 @@ function Matches() {
       setOpen(false);
       setEditModalOpen(false);
       setOpenMatch(false)
+      // console.log("res: ", response.data.data.sport);
+
       setData(response.data.data.sport);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
@@ -283,7 +286,6 @@ function Matches() {
     }
   };
 
-
   React.useEffect(() => {
     void getMatchesForSport();
     void getTeamsForSport();
@@ -314,9 +316,12 @@ function Matches() {
         league: data.league.name,
         streamingLinks: event.streamingLinks,
         externalLinks: event.externalLinks,
+        isLocal: event.isLocal
         // streamingLinks: event.streamingLinks.map(link => link.href).join(', '),
       };
     }) || [];
+
+  // console.log(rows);
 
 
   const style = {
@@ -482,32 +487,43 @@ function Matches() {
       headerAlign: "center",
       renderCell: (cell) => (
         <Box display="flex" height="100%" alignItems={"center"}>
-          <IconButton onClick={() => handleEditOpen(cell.row)}>
-            <Avatar
-              src={EditIcon}
-              alt="edit Icon"
-              sx={{ height: "20px", width: "20px", borderRadius: 0 }}
-            />
-          </IconButton>
+          <>
+            <IconButton onClick={() => handleEditOpen(cell.row)}>
+              <Avatar
+                src={EditIcon}
+                alt="edit Icon"
+                sx={{ height: "20px", width: "20px", borderRadius: 0 }}
+              />
+            </IconButton>
+            &nbsp;&nbsp;&nbsp;
+            {cell.row.isLocal && (
+              <IconButton onClick={() => deleteMatch(cell.row._id)}>
+                <Avatar
+                  src={TrashIcon}
+                  alt="trash Icon"
+                  sx={{ height: "20px", width: "20px", borderRadius: 0 }}
+                />
+              </IconButton>
+            )}
+          </>
         </Box>
       ),
     },
   ];
 
-
   const addMatches = async () => {
     const randomId = Math.random().toString().slice(2, 12);
     const competitors = teamData.filter(team => team.slug === matchData.homeTeam || team.slug === matchData.awayTeam).map(team => {
-      const logo = typeof team.logos === "object" ? (team.logos.length > 3 ? team.logos[2] : team.logos[0]) : team.logos
-      delete team.links
-      delete team.logos
-      return { ...team, logo: logo.href, displayName: team.teams }
+      const clonedTeam = { ...team }
+      const logo = typeof clonedTeam.logos === "object" ? (clonedTeam.logos.length > 3 ? clonedTeam.logos[2] : clonedTeam.logos[0]) : clonedTeam.logos
+      delete clonedTeam.links
+      delete clonedTeam.logos
+      return { ...clonedTeam, logo: logo.href, displayName: clonedTeam.teams }
     })
     try {
       const data = getSportFromSession();
       if (!data.sport || !data.league) {
         notify("error", "Sport or league not found");
-        // console.error("Sport or league not found");
         return;
       }
       const response = await API_CALL.addMatches({
@@ -517,6 +533,8 @@ function Matches() {
         isLocal: true,
         matchId: randomId,
         eventId: randomId,
+        description: matchData.description,
+        note: matchData.note,
         competitors
       });
       setOpenMatch(false)
@@ -525,16 +543,28 @@ function Matches() {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       notify("error", error.response.data.message);
-
-      // console.error(
-      //   "Error fetching matches for sport:",
-      //   error.response.data.message
-      // );
     }
   };
 
+  const deleteMatch = async (id: string) => {
+    try {
+      await API_CALL.deleteMatch(id)
+      void getMatchesForSport();
+    } catch (e) {
+      console.log(e)
+
+    }
+  }
+
   const options = teamData.map(match => ({ ...match, label: match.teams, value: match.slug }))
 
+  const deleteLink = (idx: number, isExternal = false) => {
+    if (isExternal) {
+      setExternalLinks(prev => prev.filter((_, id) => id !== idx))
+    } else {
+      setLinks(prev => prev.filter((_, id) => id !== idx))
+    }
+  }
 
   return (
     <Box component="div">
@@ -606,6 +636,7 @@ function Matches() {
           noRowsLabel: "No Data available",
         }}
       />
+
       <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
@@ -650,7 +681,7 @@ function Matches() {
                   sx={{ maxWidth: "780px", width: "100%" }}
                 >
                   <Grid container spacing={2}>
-                    <Grid item xs={6} >
+                    <Grid item xs={12} >
                       <DateTimePicker
                         label="Select a Sport"
                         defaultValue={matchDate}
@@ -668,19 +699,28 @@ function Matches() {
                             height: "20px"
                           }
                         }}
-                        
                         onChange={(e) => handleDateChange(e)}
                       />
                     </Grid>
-                    <Grid item xs={6}>
-                      <AppInput label="Home Team" selectOptions={options} name="homeTeam" onChange={handleChange} value={matchData.homeTeam} />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <AppInput label="Away Team" selectOptions={options} name="awayTeam" onChange={handleChange} value={matchData.awayTeam} />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <AppInput label="Description" name="description" value="" />
-                    </Grid>
+                    {getSportFromSession().league === "f1" ? (
+                      <>
+                        <Grid item xs={6}>
+                          <AppInput label="Event Name" name="description" value="" onChange={handleChange} />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <AppInput label="Event Type" name="note" value="" onChange={handleChange} />
+                        </Grid>
+                      </>
+                    ) : (
+                      <>
+                        <Grid item xs={6}>
+                          <AppInput label="Home Team" selectOptions={options} name="homeTeam" onChange={handleChange} value={matchData.homeTeam} />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <AppInput label="Away Team" selectOptions={options} name="awayTeam" onChange={handleChange} value={matchData.awayTeam} />
+                        </Grid>
+                      </>
+                    )}
                   </Grid>
                 </Box>
               </Box>
@@ -752,7 +792,7 @@ function Matches() {
                 {links.map((link, index) => (
                   <Box key={index}>
                     <Typography>{link.label}:</Typography>
-                    <Box display="flex" columnGap="20px" mt={1}>
+                    <Box display="flex" columnGap="20px" alignItems="flex-end" mt={1}>
                       <Box width="30%">
                         <AppInput
                           label="Name"
@@ -773,6 +813,15 @@ function Matches() {
                           }
                         />
                       </Box>
+                      {links.length !== 1 && (
+                        <IconButton onClick={() => deleteLink(index)}>
+                          <Avatar
+                            src={TrashIcon}
+                            alt="trash Icon"
+                            sx={{ height: "20px", width: "20px", borderRadius: 0 }}
+                          />
+                        </IconButton>
+                      )}
                     </Box>
                   </Box>
                 ))}
@@ -812,7 +861,7 @@ function Matches() {
                   {externalLinks.map((link, index) => (
                     <Box key={index}>
                       <Typography>{link.label}:</Typography>
-                      <Box display="flex" columnGap="20px" mt={1} mb={2}>
+                      <Box display="flex" columnGap="20px" alignItems="flex-end" mt={1} mb={2}>
                         <Box width="30%">
                           <AppInput
                             label="Name"
@@ -843,6 +892,15 @@ function Matches() {
                             }
                           />
                         </Box>
+                        {externalLinks.length !== 1 && (
+                          <IconButton onClick={() => deleteLink(index, true)}>
+                            <Avatar
+                              src={TrashIcon}
+                              alt="trash Icon"
+                              sx={{ height: "20px", width: "20px", borderRadius: 0 }}
+                            />
+                          </IconButton>
+                        )}
                       </Box>
                     </Box>
                   ))}

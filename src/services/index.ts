@@ -47,6 +47,8 @@ interface Matchesdata extends Sport, TeamData {
   matchId: string;
   eventId: string;
   isLocal: boolean;
+  description?: string
+  note?: string
   competitors: any[]
 }
 interface UserUpdateProfileType {
@@ -88,6 +90,7 @@ const API_CALL = {
   addStreamingLink: async (data: StreamingLinkData) => jsonApi.post(`sports/links/`, data),
   updateStreamingLink: async (id: string, data: StreamingLinkData) => jsonApi.patch(`sports/links/${id}`, data),
   addMatches: async (data: Matchesdata) => jsonApi.post(`sports`, data),
+  deleteMatch: async (id: string) => jsonApi.delete(`sports/${id}`),
 
   // teams
   getTeams: async (data: TeamData) => jsonApi.get(`sports/teams/${data.sport}/${data.league}`),

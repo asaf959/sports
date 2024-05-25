@@ -1,4 +1,4 @@
-import { Box, Grid, Paper, Typography } from "@mui/material";
+import { Avatar, Box, Grid, Paper, Typography } from "@mui/material";
 import PageHeader from "../../components/header";
 import { Button } from "../../components/button";
 import AppInput from "../../components/newInput";
@@ -6,6 +6,8 @@ import AddIcon from "@mui/icons-material/Add";
 import { useEffect, useState } from "react";
 import API_CALL from "../../services";
 import { getSportFromSession } from "../../utils/utils";
+import IconButton from "../../components/iconButton";
+import TrashIcon from "../../assets/svg/trash.svg";
 
 function AlternateLinks() {
   const language = [
@@ -50,16 +52,17 @@ function AlternateLinks() {
     try {
       const sportArr = [Object.values(getSportFromSession())[0], Object.values(getSportFromSession())[1]] as const
       const { data: res } = await API_CALL.getAlternativeLinks(...sportArr)
-
-      console.log(res.data.alternateLinks);
       if (res.data.alternateLinks && res.data.alternateLinks.links.length > 0) {
         setLinks(res.data.alternateLinks.links)
-        console.log(res.data.alternateLinks.links);
 
       }
     } catch (e) {
       console.log(e)
     }
+  }
+
+  const deleteLink = (idx: number) => {
+    setLinks(prev => prev.filter((_, id) => id !== idx))
   }
 
   useEffect(() => {
@@ -90,6 +93,7 @@ function AlternateLinks() {
                       <Box
                         width={"100%"}
                         display={"flex"}
+                        alignItems="flex-end"
                         padding={1}
                         columnGap={2}
                       >
@@ -130,6 +134,17 @@ function AlternateLinks() {
                             onChange={(e) => onChange(idx, e)}
                           />
                         </Grid>
+                        {links.length !== 1 && (
+                          <Grid item xs={2} sx={{ marginBottom: "30px" }}>
+                            <IconButton onClick={() => deleteLink(idx)}>
+                              <Avatar
+                                src={TrashIcon}
+                                alt="trash Icon"
+                                sx={{ height: "20px", width: "20px", borderRadius: 0 }}
+                              />
+                            </IconButton>
+                          </Grid>
+                        )}
                       </Box>
                     </Box>
                   ))}
