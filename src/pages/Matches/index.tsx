@@ -243,7 +243,7 @@ function Matches() {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       notify("error", error.response.data.message);
-
+      setData(undefined);
       // console.error(
       //   "Error fetching matches for sport:",
       //   error.response.data.message
@@ -312,7 +312,7 @@ function Matches() {
         awayLogo: isUFC ? event?.competitors ? event.competitors[1].headshot : [] : event?.competitors ? event.competitors[1]?.logo : [],
         leagueLogo: data.logo.href,
         description: event.description + " " + event.note,
-        teams: `${event?.competitors ? event.competitors[0].displayName : ""} vs ${event?.competitors ? event.competitors[1].displayName : ""}`,
+        teams: `${event?.competitors.length ? event.competitors[0].displayName : ""} vs ${event?.competitors.length ? event.competitors[1].displayName : ""}`,
         league: data.league.name,
         streamingLinks: event.streamingLinks,
         externalLinks: event.externalLinks,
@@ -546,6 +546,8 @@ function Matches() {
     }
   };
 
+  console.log(matchData);
+
   const deleteMatch = async (id: string) => {
     try {
       await API_CALL.deleteMatch(id)
@@ -705,10 +707,10 @@ function Matches() {
                     {getSportFromSession().league === "f1" ? (
                       <>
                         <Grid item xs={6}>
-                          <AppInput label="Event Name" name="description" value="" onChange={handleChange} />
+                          <AppInput label="Event Name" name="description" value={matchData.description} onChange={handleChange} />
                         </Grid>
                         <Grid item xs={6}>
-                          <AppInput label="Event Type" name="note" value="" onChange={handleChange} />
+                          <AppInput label="Event Type" name="note" value={matchData.note} onChange={handleChange} />
                         </Grid>
                       </>
                     ) : (
