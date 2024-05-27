@@ -73,6 +73,10 @@ svg {
   max-width: 100%;
 }
 
+img:not([src]) {
+  display: none;
+}
+
 #root {
   @extend %d-contents;
 }

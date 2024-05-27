@@ -516,9 +516,10 @@ function Matches() {
     const competitors = teamData.filter(team => team.slug === matchData.homeTeam || team.slug === matchData.awayTeam).map(team => {
       const clonedTeam = { ...team }
       const logo = typeof clonedTeam.logos === "object" ? (clonedTeam.logos.length > 3 ? clonedTeam.logos[2] : clonedTeam.logos[0]) : clonedTeam.logos
+
       delete clonedTeam.links
       delete clonedTeam.logos
-      return { ...clonedTeam, logo: logo.href, displayName: clonedTeam.teams }
+      return { ...clonedTeam, logo: logo?.href, displayName: clonedTeam.teams }
     })
     try {
       const data = getSportFromSession();
