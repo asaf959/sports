@@ -37,20 +37,6 @@ function Teams() {
     }
   `;
   const [data, setData] = React.useState<SportStateType[]>([])
-  // const getMatchesForSport = async () => {
-  //   try {
-  //      const data = JSON.parse(sessionStorage.getItem("sport") || "{}");
-  //      console.log(data)
-  //      if (!data.sport || !data.league) {
-  //        console.error("Sport or league not found in sessionStorage");
-  //        return;
-  //      }
-  //      const response = await API_CALL.getTeams({ sport: data.sport, league: data.league });
-  //      setData(response.data.data.sports);
-  //   } catch (error) {
-  //      console.error("Error fetching matches for sport:", error);
-  //   }
-  //  };
   const getMatchesForSport = async () => {
     try {
       const data = JSON.parse(sessionStorage.getItem("sport") || "{}");
@@ -118,40 +104,8 @@ function Teams() {
       headerClassName: styles.headerCell,
       cellClassName: styles.tableCell,
     },
-    // {
-    //   field: "fullName",
-    //   headerName: "LOREM IPSUM",
-
-    //   flex: 1,
-    //   // valueGetter: (params: any) =>
-    //   //   `Lorem Ipsum ${params.row.id}`, // Value getter based on the ID
-    //   // headerClassName: styles.headerClass,
-    //   // cellClassName: styles.tableCell,
-    //   valueGetter: (params: any) => {
-    //     if (params && params.row) {
-    //        return `Lorem Ipsum ${params.row.id}`;
-    //     }
-    //     return ''; // Return a default value or an empty string if the row is not available
-    //    },
-    // },
   ];
 
-  // const rows = [
-  //   { id: 1, teams: "Real Madrid", league: "League 1", country: "Country A" },
-  //   { id: 2, teams: "FC Barcelona", league: "League 2", country: "Country B" },
-  //   { id: 3, teams: "Ud Las Palmas", league: "League 3", country: "Country C" },
-  //   { id: 4, teams: "Osasuna FC", league: "League 4", country: "Country D" },
-  //   { id: 5, teams: "FC Girona ", league: "League 5", country: "Country E" },
-  //   { id: 6, teams: "Rayo Valecano", league: "League 6", country: "Country F" },
-  //   { id: 7, teams: "Real Betis", league: "League 7", country: "Country G" },
-  //   {
-  //     id: 8,
-  //     teams: "Athletico Madrid",
-  //     league: "League 8",
-  //     country: "Country H",
-  //   },
-  //   { id: 9, teams: "Real Sociedad", league: "League 9", country: "Country I" },
-  // ];
   return (
     <Box component="div">
       <PageHeader title="Teams" />

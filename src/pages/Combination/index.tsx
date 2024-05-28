@@ -6,6 +6,7 @@ import sports from "../../utils/sports";
 import { useEffect, useState } from "react";
 import API_CALL from "../../services";
 import { getSportFromSession } from "../../utils/utils";
+import notify from "../../utils/notify";
 
 function Combination() {
   const [inputs, setInputs] = useState({
@@ -28,8 +29,17 @@ function Combination() {
     setInputs(prev => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
+  // async function createCombination() {
+  //   await API_CALL.createCombination({ ...getSportFromSession(), combination })
+  // }
+
   async function createCombination() {
-    await API_CALL.createCombination({ ...getSportFromSession(), combination })
+    try {
+      await API_CALL.createCombination({ ...getSportFromSession(), combination });
+      notify("success", "Combination created successfully!");
+    } catch (error: any) {
+      notify("error", error.response.data.message);
+    }
   }
 
   async function getCombination() {
@@ -49,6 +59,7 @@ function Combination() {
 
   useEffect(() => {
     getCombination()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // console.log(inputs);

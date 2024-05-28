@@ -5,6 +5,7 @@ import AppInput from "../../components/newInput";
 import { useEffect, useState } from "react";
 import API_CALL from "../../services";
 import { getSportFromSession } from "../../utils/utils";
+import notify from "../../utils/notify";
 
 function Channels() {
   const [channels, setChannels] = useState([
@@ -26,8 +27,9 @@ function Channels() {
   async function createChannel() {
     try {
       await API_CALL.createChannel({ ...getSportFromSession(), alternateLinks: channels })
-    } catch (e) {
-      console.log(e);
+      notify("success", "channels added successfully!");
+    } catch (e: any) {
+      notify("error", e.response.data.message);
     }
   }
 
@@ -36,8 +38,9 @@ function Channels() {
       const sportArr = [Object.values(getSportFromSession())[0], Object.values(getSportFromSession())[1]] as const
       const { data: res } = await API_CALL.getChannels(...sportArr)
       setChannels(res.data.channels.links)
-    } catch (e) {
-      console.log(e);
+    } catch (e: any) {
+      // console.log(e)
+      notify("error", "No channels found");
     }
   }
 

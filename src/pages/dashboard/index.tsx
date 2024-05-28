@@ -5,6 +5,7 @@ import AppInput from "../../components/newInput";
 import { useEffect, useState } from "react";
 import API_CALL from "../../services";
 import { getSportFromSession } from "../../utils/utils";
+import notify from "../../utils/notify";
 function Dashboard() {
   const [link, setLink] = useState("");
 
@@ -41,6 +42,7 @@ function Dashboard() {
 
   async function addMasterLink() {
     await API_CALL.addMasterLink({ ...getSportFromSession(), link })
+    notify("success", "Master link added successfully!");
   }
 
   const handleInputChange: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> | undefined = (e) => {
