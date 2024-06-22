@@ -15,8 +15,6 @@ function Channels() {
   const emptyChannel = { title: "", link: "", icon: "", value: "" };
   const [channels, setChannels] = useState([emptyChannel]);
 
-  console.log(channels);
-
 
   function onChange(idx: number, e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     setChannels(prev => {
@@ -47,8 +45,8 @@ function Channels() {
     const isNotEmpty = channels.find(val => val.title && val.link)
     if (isNotEmpty) {
       try {
-        console.log({ ...getSportFromSession(), alternateLinks: channels });
         await API_CALL.createChannel({ ...getSportFromSession(), alternateLinks: channels })
+        notify("success", "Channels Updated Successfully");
       } catch (e) {
         console.log(e);
       }

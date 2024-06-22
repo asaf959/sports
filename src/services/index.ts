@@ -9,7 +9,7 @@ interface Sport {
   league: string;
 }
 interface SportData extends Sport {
-  date: string;
+  date?: string;
   team?: string;
 }
 interface CombinationData extends Sport {
@@ -84,7 +84,7 @@ const API_CALL = {
   logout: async () => jsonApi.post(`auth/logout`),
 
   // matches
-  getMatches: async (data: SportData) => jsonApi.get(`sports/matches/${data.sport}/${data.league}/${data.date}`),
+  getMatches: async (data: SportData) => jsonApi.get(`sports/matches/${data.sport}/${data.league}/${data?.date}`),
 
   // add streaming links
   addStreamingLink: async (data: StreamingLinkData) => jsonApi.post(`sports/links/`, data),

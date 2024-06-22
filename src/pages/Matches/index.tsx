@@ -134,7 +134,6 @@ function Matches() {
   const handleDateChange = (e: dayjs.Dayjs | null) => {
     if (e) {
       const date = new Date(`${e.month()}-${e.date()}-${e.year()} ${e.hour()}:${e.minute()}`);
-      console.log(date);
       setMatchData(prev => ({ ...prev, date: date }))
     }
   }
@@ -309,8 +308,8 @@ function Matches() {
         time: time,
         homeTeam: event?.competitors?.length ? event.competitors[0].displayName : [],
         awayTeam: event?.competitors?.length ? event.competitors[1].displayName : [],
-        homeLogo: isUFC ? event?.competitors?.length ? event.competitors[0].headshot : [] : event?.competitors?.length ? event.competitors[0]?.logo : [],
-        awayLogo: isUFC ? event?.competitors ? event.competitors[1].headshot : [] : event?.competitors ? event.competitors[1]?.logo : [],
+        homeLogo: isUFC ? event?.competitors?.length ? event.competitors[0]?.headshot : [] : event?.competitors?.length ? event.competitors[0]?.logo : [],
+        awayLogo: isUFC ? event?.competitors ? event.competitors[1]?.headshot : [] : event?.competitors ? event.competitors[1]?.logo : [],
         leagueLogo: data.logo.href,
         description: event.description + " " + event.note,
         teams: `${event?.competitors?.length ? event.competitors[0].displayName : ""} vs ${event?.competitors?.length ? event.competitors[1].displayName : ""}`,
@@ -427,7 +426,7 @@ function Matches() {
       headerClassName: styles.headerCell,
       cellClassName: styles.tableCell,
       renderCell: (params) => (
-        getSportFromSession().league === "f1" ?
+        isF1 || (isMMA && params.row.isLocal) ?
           params.row.description :
           <Box display="flex" alignItems="center" height="100%">
             <Typography fontSize="13px" style={{ marginRight: '10px' }}>{params.row.homeTeam}</Typography>
@@ -559,8 +558,6 @@ function Matches() {
       notify("error", error.response.data.message);
     }
   };
-
-  console.log(matchData);
 
   const deleteMatch = async (id: string) => {
     try {
