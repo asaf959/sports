@@ -15,6 +15,7 @@ function SportTab({ sport, selected, onClick }: Props) {
         height: "148px",
         width: "148px",
         borderRadius: "12px",
+        p: 4,
         display: "flex",
         justifyContent: "center",
         flexDirection: "column",
@@ -34,7 +35,7 @@ function SportTab({ sport, selected, onClick }: Props) {
       onClick={onClick}
     >
       <Box sx={{textAlign: "center"}}><img src={`/leagues/${sport.toLowerCase()}.png`} alt={sport} /></Box>
-      <Typography sx={{ fontWeight: 500, fontSize: 18 }}>{sport}</Typography>
+      <Typography sx={{ mt: "auto",fontWeight: 500, fontSize: 18 }}>{sport}</Typography>
     </Paper>
   );
 }
