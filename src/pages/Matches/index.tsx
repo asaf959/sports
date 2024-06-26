@@ -94,6 +94,7 @@ function Matches() {
       font-size: 14px !important;
     }
   `;
+  const [search, setSearch] = React.useState("");
   const [data, setData] = React.useState<ApiDataType>();
   const [open, setOpen] = React.useState(false);
   const [openMatch, setOpenMatch] = React.useState(false);
@@ -594,6 +595,8 @@ function Matches() {
           }}
           fullWidth
           placeholder="Search"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -620,7 +623,7 @@ function Matches() {
       </Box>
 
       <Table
-        rows={rows}
+        rows={rows.filter(val => `${val.awayTeam} vs ${val.homeTeam}`.toLowerCase().includes(search.toLowerCase()))}
         columns={columns}
         columnHeaderHeight={54}
         rowHeight={64}
