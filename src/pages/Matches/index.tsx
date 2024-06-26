@@ -540,6 +540,7 @@ function Matches() {
       });
       setOpenMatch(false)
       setData(response.data.data.sport);
+      notify("success", "Match added successfully!");
       void getMatchesForSport();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
@@ -552,6 +553,7 @@ function Matches() {
   const deleteMatch = async (id: string) => {
     try {
       await API_CALL.deleteMatch(id)
+      notify("success", "Match deleted successfully!");
       void getMatchesForSport();
     } catch (e) {
       console.log(e)
@@ -564,8 +566,10 @@ function Matches() {
   const deleteLink = (idx: number, isExternal = false) => {
     if (isExternal) {
       setExternalLinks(prev => prev.filter((_, id) => id !== idx))
+      notify("success", "External link deleted successfully!");
     } else {
       setLinks(prev => prev.filter((_, id) => id !== idx))
+      notify("success", "streaming links deleted successfully!");
     }
   }
 

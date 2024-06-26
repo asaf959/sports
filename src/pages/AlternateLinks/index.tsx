@@ -8,6 +8,7 @@ import API_CALL from "../../services";
 import { getSportFromSession } from "../../utils/utils";
 import IconButton from "../../components/iconButton";
 import TrashIcon from "../../assets/svg/trash.svg";
+import notify from "../../utils/notify";
 
 function AlternateLinks() {
   const language = [
@@ -43,6 +44,7 @@ function AlternateLinks() {
         ...getSportFromSession(),
         alternateLinks: links
       })
+      notify("success", "Alternate links added successfully!");
     } catch (e) {
       console.log(e);
     }
@@ -63,6 +65,7 @@ function AlternateLinks() {
 
   const deleteLink = (idx: number) => {
     setLinks(prev => prev.filter((_, id) => id !== idx))
+    notify("success", "Alternate links deleted successfully!");
   }
 
   useEffect(() => {
