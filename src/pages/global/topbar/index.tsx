@@ -10,6 +10,7 @@ import logoSvg from "../../../assets/svg/logoApp.svg";
 import useStore from "../../../store";
 
 import ProfileMenu from "./profileMenu";
+import { getSportFromSession } from "../../../utils/utils";
 
 interface Props {
   className: string;
@@ -17,6 +18,8 @@ interface Props {
 
 function Header({ className }: Props) {
   const { setSidebar, title } = useStore();
+
+  const sport = getSportFromSession();
 
   return (
     <Paper variant="outlined" className={className} sx={{ boxShadow: "none" }}>
@@ -35,13 +38,15 @@ function Header({ className }: Props) {
           <Box
             sx={{
               flexGrow: 1,
-
               display: "flex",
-              columnGap: "150px",
+              alignItems: "center"
             }}
           >
-            <img src={logoSvg} alt="Logo" />
-            <Box sx={{ fontSize: "28px", fontWeight: 600 }}>{title}</Box>
+            <Box mr={"100px"}>
+              <img src={logoSvg} alt="Logo" />
+            </Box>
+            <img src={`/leagues/${sport.league.toLowerCase()}.png`} alt={sport.league} />
+            <Box sx={{ ml: "20px", fontSize: "28px", fontWeight: 600 }}>{title}</Box>
           </Box>
 
           <Box display="flex" alignItems="center">

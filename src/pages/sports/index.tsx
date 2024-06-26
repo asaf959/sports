@@ -9,6 +9,7 @@ import useStore from "../../store";
 import API_CALL from "../../services";
 import { removeUser } from "../../utils/session";
 import { useLoggedInUpdate } from "../../loggedInContext";
+import { capitalize } from "lodash";
 
 function Sports() {
   const { setTitle } = useStore();
@@ -18,7 +19,7 @@ function Sports() {
 
   const handleSportSelection = (sport: string, league: string) => {
     setSelectedLeague(league);
-    setTitle(sport);
+    setTitle(capitalize(sport));
     // Store the sport and league in sessionStorage
     sessionStorage.setItem("sport", JSON.stringify({ sport, league }));
   };

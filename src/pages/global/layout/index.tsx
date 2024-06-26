@@ -1,11 +1,21 @@
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import PageALert from "../../../components/pageAlert";
 import Sidebar from "../sidebar";
 import Topbar from "../topbar";
 import styles from "./layout.module.scss";
+import useStore from "../../../store";
+import { getSportFromSession } from "../../../utils/utils";
+import { capitalize } from "lodash";
 
 function Layout() {
+  const { setTitle } = useStore();
+  const sport = getSportFromSession();
+  
+  useEffect(() => {
+    setTitle(capitalize(sport.sport));
+  }, [setTitle, sport.sport]);
+
   return (
     <main className={styles.page}>
       <Topbar className={styles.page__header} />

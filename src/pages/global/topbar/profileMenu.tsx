@@ -16,7 +16,8 @@ import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import { useLoggedInUpdate } from "../../../loggedInContext";
 import { manageAccountPath } from "../../../router/path";
 import API_CALL from "../../../services";
-import { removeUser } from "../../../utils/session";
+import { getCurrentUser, removeUser } from "../../../utils/session";
+import { capitalize } from "lodash";
 
 function ProfileMenu() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -47,6 +48,10 @@ function ProfileMenu() {
     }
   }
 
+  const user = getCurrentUser()
+
+  console.log(user.email);
+
   return (
     <React.Fragment>
       <Box sx={{ display: "flex", alignItems: "center", textAlign: "center" }}>
@@ -62,11 +67,9 @@ function ProfileMenu() {
                   color: "#000",
                   // fontWeight: 600,
                 }}
-              >
-                K L
-              </Avatar>
+              />
             </ListItemAvatar>
-            <ListItemText primary="James Lanister" secondary="User" />
+            <ListItemText primary={user.email} secondary={capitalize(user.role)} />
           </ListItemButton>
         </Tooltip>
       </Box>

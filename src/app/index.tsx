@@ -35,6 +35,7 @@ function App(): JSX.Element {
 
   useEffect(() => {
     isLoggedIn();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

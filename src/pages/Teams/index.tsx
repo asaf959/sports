@@ -1,4 +1,4 @@
-import { Box, InputAdornment, styled } from "@mui/material";
+import { Box, InputAdornment, Typography, styled } from "@mui/material";
 import PageHeader from "../../components/header";
 import styles from "./style.module.scss";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
@@ -7,6 +7,8 @@ import SearchIcon from "@mui/icons-material/Search";
 import API_CALL from "../../services";
 import React from "react";
 
+
+type Logo = { href: string }
 type SportsType = {
   leagues: {
     name: string
@@ -16,12 +18,13 @@ type SportsType = {
         displayName: string
         league: string
         location: string
+        logos: Logo[]
       }
     }[]
   }[]
 }
 
-type SportStateType = Omit<SportsType["leagues"][0]["teams"][0]["team"], "displayName" | "location"> & { teams: string, city: string }
+type SportStateType = Omit<SportsType["leagues"][0]["teams"][0]["team"], "displayName" | "location" | "logos"> & { teams: string, city: string, logo: string }
 
 function Teams() {
   const Table = styled(DataGrid)`
@@ -37,6 +40,7 @@ function Teams() {
     }
   `;
   const [data, setData] = React.useState<SportStateType[]>([])
+  const [search, setSearch] = React.useState("");
   const getMatchesForSport = async () => {
     try {
       const data = JSON.parse(sessionStorage.getItem("sport") || "{}");
@@ -45,7 +49,6 @@ function Teams() {
         return;
       }
       const response = await API_CALL.getTeams({ sport: data.sport, league: data.league });
-      console.log(response)
       // Assuming response.data.data.sports is the array of sports
       const sports = response.data.data.sports as SportsType[];
       const flattenedData = sports.flatMap(sport =>
@@ -55,6 +58,7 @@ function Teams() {
             teams: team.team.displayName,
             league: league.name,
             city: team.team.location,
+            logo: team.team.logos[0].href
           }))
         )
       );
@@ -87,6 +91,14 @@ function Teams() {
       sortable: false,
       headerClassName: styles.headerCell,
       cellClassName: styles.tableCell,
+      renderCell(params) {
+        return (
+          <Box height="100%" display="flex" alignItems="center" gap={2}>
+            <img src={params.row.logo} width="50px" alt={params.value} />
+            <Typography variant="body1" className={styles.tableCell}>{params.value}</Typography>
+          </Box>
+        );
+      },
     },
     {
       field: "league",
@@ -119,6 +131,8 @@ function Teams() {
           }}
           fullWidth
           placeholder="Search"
+          onChange={e => setSearch(e.target.value)}
+          value={search}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -129,7 +143,7 @@ function Teams() {
         />
       </Box>
       <Table
-        rows={data}
+        rows={data.sort((a, b) => +a.id - +b.id).filter(val => val.teams.toLowerCase().includes(search.toLowerCase()))}
         columns={columns}
         columnHeaderHeight={54}
         rowHeight={64}
