@@ -535,10 +535,14 @@ function Matches() {
         notify("error", "Sport or league not found");
         return;
       }
+      const date = matchData.date;
+      const now_utc =  Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
+      date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
+
       const response = await API_CALL.addMatches({
         sport: data.sport,
         league: data.league,
-        date: matchData.date,
+        date: new Date(now_utc),
         isLocal: true,
         matchId: randomId,
         eventId: randomId,
