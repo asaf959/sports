@@ -6,18 +6,38 @@ import { Button } from "../../components/button";
 import { useNavigate } from "react-router-dom";
 import { dashboardPath } from "../../router/path";
 import useStore from "../../store";
+import API_CALL from "../../services";
+import { removeUser } from "../../utils/session";
+import { useLoggedInUpdate } from "../../loggedInContext";
 
 function Sports() {
   const { setTitle } = useStore();
   const navigate = useNavigate();
   const [selectedLeague, setSelectedLeague] = useState<string>("");
+  const setloginStatus = useLoggedInUpdate();
 
-const handleSportSelection = (sport: string, league: string) => {
-  setSelectedLeague(league);
-  setTitle(sport);
-  // Store the sport and league in sessionStorage
-  sessionStorage.setItem("sport", JSON.stringify({ sport, league }));
- };
+  const handleSportSelection = (sport: string, league: string) => {
+    setSelectedLeague(league);
+    setTitle(sport);
+    // Store the sport and league in sessionStorage
+    sessionStorage.setItem("sport", JSON.stringify({ sport, league }));
+  };
+
+  async function logout() {
+    try {
+      const res = await API_CALL.logout();
+      if (res.data.status === "success") {
+        removeUser();
+        setloginStatus("loggedout");
+        navigate("/");
+      }
+
+      return null;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      return err.response;
+    }
+  }
 
 
   return (
@@ -32,6 +52,19 @@ const handleSportSelection = (sport: string, league: string) => {
         padding: "80px 182px",
       }}
     >
+      <Button
+        variant="contained"
+        color="primary"
+        size="large"
+        onClick={logout}
+        sx={{
+          position: "absolute",
+          top: 30,
+          right: 30,
+        }}
+      >
+        Logout
+      </Button>
       <Box
         sx={{
           display: "flex",
@@ -52,52 +85,44 @@ const handleSportSelection = (sport: string, league: string) => {
       >
         <SportTab
           sport="NBA"
-          league="nba"
           selected={selectedLeague === "nba"}
           onClick={() => handleSportSelection("basketball", "nba")}
-          />
+        />
         <SportTab
           sport="MLB"
-          league="mlb"
           selected={selectedLeague === "mlb"}
           onClick={() => handleSportSelection("baseball", "mlb")}
-          />
-          <SportTab
+        />
+        <SportTab
           sport="NHL"
-          league="nhl"
           selected={selectedLeague === "nhl"}
           onClick={() => handleSportSelection("hockey", "nhl")}
-          />
-          <SportTab
+        />
+        <SportTab
           sport="NFL"
-          league="nfl"
           selected={selectedLeague === "nfl"}
           onClick={() => handleSportSelection("football", "nfl")}
-          />
-          <SportTab
+        />
+        <SportTab
           sport="CFL"
-          league="cfl"
           selected={selectedLeague === "cfl"}
           onClick={() => handleSportSelection("football", "cfl")}
-          />
-          <SportTab
+        />
+        <SportTab
           sport="Tennis"
-          league="all"
           selected={selectedLeague === "tournament"}
           onClick={() => handleSportSelection("tennis", "tournament")}
-          />
-          <SportTab
+        />
+        <SportTab
           sport="F1"
-          league="f1"
           selected={selectedLeague === "f1"}
           onClick={() => handleSportSelection("racing", "f1")}
-          />
-          <SportTab
+        />
+        <SportTab
           sport="MMA"
-          league="ufc"
           selected={selectedLeague === "ufc"}
           onClick={() => handleSportSelection("mma", "ufc")}
-          />
+        />
       </Box>
       <Box
         sx={{

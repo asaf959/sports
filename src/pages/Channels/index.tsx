@@ -1,33 +1,59 @@
-import { Box, Grid, Paper, Typography } from "@mui/material";
+import { Avatar, Box, Grid, Paper, Typography } from "@mui/material";
 import PageHeader from "../../components/header";
+import TrashIcon from "../../assets/svg/trash.svg";
 import { Button } from "../../components/button";
 import AppInput from "../../components/newInput";
 import { useEffect, useState } from "react";
 import API_CALL from "../../services";
+import notify from "../../utils/notify";
+
 import { getSportFromSession } from "../../utils/utils";
+import defaultChannels from "./defaultChannels";
+import IconButton from "../../components/iconButton";
 
 function Channels() {
-  const [channels, setChannels] = useState([
-    { title: "", link: "" },
-    { title: "", link: "" },
-    { title: "", link: "" },
-    { title: "", link: "" }
-  ]);
+  const emptyChannel = { title: "", link: "", icon: "", value: "" };
+  const [channels, setChannels] = useState([emptyChannel]);
+
+  console.log(channels);
+
 
   function onChange(idx: number, e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     setChannels(prev => {
       const arr = [...prev]
       const el = e.target.name as keyof typeof channels[0]
       arr[idx][el] = e.target.value
+      if (el === "title") {
+        const currentChannel = defaultChannels.find(val => val.value === e.target.value)
+        arr[idx].title = currentChannel?.label || ""
+        arr[idx].icon = currentChannel?.icon || ""
+        arr[idx].value = currentChannel?.value || ""
+      } else {
+        arr[idx][el] = e.target.value
+      }
       return arr
     })
   }
 
+  function addChannel() {
+    setChannels(prev => [...prev, emptyChannel])
+  }
+
+  function deleteChannel(idx: number) {
+    setChannels(prev => prev.filter((_, id) => id !== idx))
+  }
+
   async function createChannel() {
-    try {
-      await API_CALL.createChannel({ ...getSportFromSession(), alternateLinks: channels })
-    } catch (e) {
-      console.log(e);
+    const isNotEmpty = channels.find(val => val.title && val.link)
+    if (isNotEmpty) {
+      try {
+        console.log({ ...getSportFromSession(), alternateLinks: channels });
+        await API_CALL.createChannel({ ...getSportFromSession(), alternateLinks: channels })
+      } catch (e) {
+        console.log(e);
+      }
+    } else {
+      notify("error", "Please select atleast one channel and enter its link");
     }
   }
 
@@ -35,7 +61,8 @@ function Channels() {
     try {
       const sportArr = [Object.values(getSportFromSession())[0], Object.values(getSportFromSession())[1]] as const
       const { data: res } = await API_CALL.getChannels(...sportArr)
-      setChannels(res.data.channels.links)
+      const filtered = res.data.channels.links.map((val: any) => ({ title: val.title, icon: val.icon, value: val.title, link: val.link }))
+      setChannels(filtered)
     } catch (e) {
       console.log(e);
     }
@@ -68,12 +95,23 @@ function Channels() {
                   <Typography sx={{ fontSize: "28px", fontWeight: 700 }}>
                     0{idx + 1}
                   </Typography>
-                  <Box width={"100%"} display={"flex"} padding={1} columnGap={2}>
-                    <Grid item xs={6} sx={{ marginBottom: "30px" }}>
-                      <AppInput name="title" label="Channel Name" placeholder="Enter the channel name" value={val.title} onChange={(e) => onChange(idx, e)} />
+                  <Box width={"100%"} display="flex" alignItems="flex-end" padding={1} columnGap={2} sx={{ marginBottom: "30px" }} >
+                    <Grid item xs={6}>
+                      <AppInput name="title" label="Channel Name" selectOptions={defaultChannels} value={val.value} onChange={(e) => onChange(idx, e)} />
                     </Grid>
-                    <Grid item xs={6} sx={{ marginBottom: "30px" }}>
+                    <Grid item xs={6}>
                       <AppInput name="link" label="Channel link" placeholder="Enter the channel link" value={val.link} onChange={(e) => onChange(idx, e)} />
+                    </Grid>
+                    <Grid item xs={2}>
+                      {channels.length > 1 && (
+                        <IconButton onClick={() => deleteChannel(idx)}>
+                          <Avatar
+                            src={TrashIcon}
+                            alt="trash Icon"
+                            sx={{ height: "20px", width: "20px", borderRadius: 0 }}
+                          />
+                        </IconButton>
+                      )}
                     </Grid>
                   </Box>
                 </Box>
@@ -86,8 +124,19 @@ function Channels() {
                 display: "flex",
                 justifyContent: "center",
                 marginTop: "60px",
+                gap: 4
               }}
             >
+              <Button
+                variant="outlined"
+                color="primary"
+                size="large"
+                fullWidth
+                sx={{ width: "274px" }}
+                onClick={addChannel}
+              >
+                Add Channel
+              </Button>
               <Button
                 variant="contained"
                 color="primary"

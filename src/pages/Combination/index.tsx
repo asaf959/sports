@@ -1,4 +1,5 @@
-import { Box, Grid, Paper } from "@mui/material";
+import { Avatar, Box, Grid, Paper } from "@mui/material";
+import TrashIcon from "../../assets/svg/trash.svg";
 import PageHeader from "../../components/header";
 import { Button } from "../../components/button";
 import AppInput from "../../components/newInput";
@@ -6,9 +7,10 @@ import sports from "../../utils/sports";
 import { useEffect, useState } from "react";
 import API_CALL from "../../services";
 import { getSportFromSession } from "../../utils/utils";
+import IconButton from "../../components/iconButton";
 
 function Combination() {
-  const [inputs, setInputs] = useState({
+  const [inputs, setInputs] = useState<Record<string, string>>({
     sport1: "",
     sport2: "",
     sport3: "",
@@ -47,11 +49,15 @@ function Combination() {
     }))
   }
 
+
   useEffect(() => {
-    getCombination()
+    void getCombination()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // console.log(inputs);
+  const deleteCombination = (input: string) => {
+    setInputs((prev) => ({ ...prev, [input]: "" }))
+  }
 
   return (
     <Box component="div">
@@ -68,18 +74,20 @@ function Combination() {
             sx={{ maxWidth: "780px", width: "100%" }}
           >
             <Grid container spacing={2}>
-              <Grid item xs={6} sx={{ marginBottom: "30px" }}>
-                <AppInput label="Sports 1" selectOptions={sports} name="sport1" onChange={handleInputChange} value={inputs.sport1} />
-              </Grid>
-              <Grid item xs={6} sx={{ marginBottom: "30px" }}>
-                <AppInput label="Sports 2" selectOptions={sports} name="sport2" onChange={handleInputChange} value={inputs.sport2} />
-              </Grid>
-              <Grid item xs={6}>
-                <AppInput label="Sports 3" selectOptions={sports} name="sport3" onChange={handleInputChange} value={inputs.sport3} />
-              </Grid>
-              <Grid item xs={6}>
-                <AppInput label="Sports 4" selectOptions={sports} name="sport4" onChange={handleInputChange} value={inputs.sport4} />
-              </Grid>
+              {Object.keys(inputs).map((input, idx) => (
+                <Grid key={idx} item xs={6} sx={{ marginBottom: "30px", display: "flex", alignItems: "flex-end", gap: 2 }}>
+                  <Box flex="1">
+                    <AppInput label={`Sports ${idx + 1}`} selectOptions={sports} name={`sport${idx + 1}`} onChange={handleInputChange} value={inputs[`sport${idx + 1}`]} />
+                  </Box>
+                  <IconButton onClick={() => deleteCombination(input)}>
+                    <Avatar
+                      src={TrashIcon}
+                      alt="trash Icon"
+                      sx={{ height: "20px", width: "20px", borderRadius: 0 }}
+                    />
+                  </IconButton>
+                </Grid>
+              ))}
             </Grid>
             <Grid
               item

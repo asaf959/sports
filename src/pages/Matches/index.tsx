@@ -312,7 +312,7 @@ function Matches() {
         awayLogo: isUFC ? event?.competitors ? event.competitors[1].headshot : [] : event?.competitors ? event.competitors[1]?.logo : [],
         leagueLogo: data.logo.href,
         description: event.description + " " + event.note,
-        teams: `${event?.competitors.length ? event.competitors[0].displayName : ""} vs ${event?.competitors.length ? event.competitors[1].displayName : ""}`,
+        teams: `${event?.competitors?.length ? event.competitors[0].displayName : ""} vs ${event?.competitors?.length ? event.competitors[1].displayName : ""}`,
         league: data.league.name,
         streamingLinks: event.streamingLinks,
         externalLinks: event.externalLinks,

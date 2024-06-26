@@ -31,8 +31,6 @@ function AppInput({ label, name, type, placeholder, value, onChange, selectOptio
     setShowPassword(!showPassword);
   };
 
-  // console.log(value, selectOptions);
-
   const renderInput = () => {
     if (selectOptions) {
       return (
@@ -51,7 +49,6 @@ function AppInput({ label, name, type, placeholder, value, onChange, selectOptio
           }}
           placeholder="Select a Sport"
           value={value}
-          defaultValue="54545"
           onChange={(e) => {
             if (e.target.value && onChange) onChange(e as React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>)
           }}

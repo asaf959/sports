@@ -1,9 +1,8 @@
-import { Paper, Typography } from "@mui/material";
+import { Box, Paper, Typography } from "@mui/material";
 
 interface Props {
   sport: string;
   selected: boolean;
-  league: string;
   onClick: () => void;
 }
 
@@ -18,6 +17,8 @@ function SportTab({ sport, selected, onClick }: Props) {
         borderRadius: "12px",
         display: "flex",
         justifyContent: "center",
+        flexDirection: "column",
+        gap: 3,
         alignItems: "center",
         transition: "background-color 0.3s, color 0.3s", // Add transition for smooth effect
         backgroundColor: selected ? "rgba(72, 128, 255, 1)" : "transparent",
@@ -32,6 +33,7 @@ function SportTab({ sport, selected, onClick }: Props) {
       }}
       onClick={onClick}
     >
+      <Box sx={{textAlign: "center"}}><img src={`/leagues/${sport.toLowerCase()}.png`} alt={sport} /></Box>
       <Typography sx={{ fontWeight: 500, fontSize: 18 }}>{sport}</Typography>
     </Paper>
   );

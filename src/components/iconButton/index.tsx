@@ -8,7 +8,7 @@ interface IconButtonProps {
 const IconButton = ({ children, onClick }: IconButtonProps) => {
   return (
     <Box
-      height={32}
+      height={47}
       width={47}
       borderRadius={1}
       border="0.6px solid #D5D5D5"

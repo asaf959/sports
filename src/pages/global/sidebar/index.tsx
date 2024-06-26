@@ -36,7 +36,7 @@ import {
 } from "../../../router/title";
 import useStore from "../../../store";
 import ConnectedTvIcon from '@mui/icons-material/ConnectedTv';
-import { ReactNode } from "react";
+import { removeTeamsOnSpecificRoutes } from "../../../router/PrivateRoutes";
 
 const StyledListItemButton = styled(ListItemButton)`
   ${({ theme }) => `
@@ -90,13 +90,13 @@ interface Props {
   className: string;
 }
 
-interface ListItem {
+interface ListItemInterface {
   name: string;
   icon: JSX.Element;
   url: string;
 }
 
-const ListItems: ListItem[] = [
+const ListItems: ListItemInterface[] = [
   {
     name: dashboardTitle,
     icon: <HomeOutlinedIcon />,
@@ -129,7 +129,7 @@ const ListItems: ListItem[] = [
   },
 ];
 
-const secondary: ListItem[] = [
+const secondary: ListItemInterface[] = [
   {
     name: "All Sports",
     icon: <KeyboardBackspaceOutlinedIcon />,
@@ -147,7 +147,11 @@ export default function Sidebar({ className }: Props) {
   const drawer = (
     <>
       <List sx={{ mb: "auto" }}>
-        {ListItems.map((item, idx) => (
+        {ListItems.filter(item => {
+          if (item.name === teamsTitle)
+            return !removeTeamsOnSpecificRoutes()
+        return true
+        }).map((item, idx) => (
           <ListItem key={idx} disablePadding>
             <StyledListItemButton
               onClick={(e) => {

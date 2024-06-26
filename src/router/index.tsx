@@ -12,6 +12,8 @@ import Users from "../pages/users";
 import ManageAccount from "../pages/manageAccount";
 import Channels from "../pages/Channels";
 import AlternateLinks from "../pages/AlternateLinks";
+import PrivateRoutes from "./PrivateRoutes";
+
 
 const teamsRoutes: RouteObject[] = [
   {
@@ -80,7 +82,12 @@ const router: RouteObject[] = [
                 index: true,
                 element: <Dashboard />,
               },
-              ...teamsRoutes,
+              {
+                element: <PrivateRoutes />,
+                children: [
+                  ...teamsRoutes,
+                ]
+              },
               ...matchesRoutes,
               ...combinationRoutes,
               ...usersRoutes,
