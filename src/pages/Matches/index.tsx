@@ -419,14 +419,6 @@ function Matches() {
       headerClassName: styles.headerCell,
       cellClassName: styles.tableCell,
     },
-    // {
-    //   field: "teams",
-    //   headerName: "Teams",
-    //   flex: 1,
-    //   sortable: false,
-    //   headerClassName: styles.headerCell,
-    //   cellClassName: styles.tableCell,
-    // },
     {
       field: "description",
       headerName: "Matches",
@@ -446,40 +438,55 @@ function Matches() {
           </Box>
       ),
     },
-
-    {
-      field: "league",
-      headerName: "League",
-      width: 180,
-      sortable: false,
-      headerClassName: styles.headerCell,
-      cellClassName: styles.tableCell,
-    },
     {
       field: "streamingLinks",
-      headerName: "Link 1",
-      width: 180,
+      headerName: "Streaming Links",
+      flex: 1,
       sortable: false,
       headerClassName: styles.headerCell,
       cellClassName: styles.tableCell,
-      renderCell: (cell) => (
-        <Box>
-          {(cell.row.streamingLinks as any[]).map((val) => val.link).join(", ")}
-        </Box>
-      ),
+      renderCell: (cell) => {
+        const links = (cell.row.streamingLinks as any[]);
+
+        return (
+          <Box>
+            {links.map((val, idx) => (
+              <>
+                <Typography component="a" sx={{ textDecoration: "none", color: "#448bff" }} variant="body2" href={val.link} target="_blank" rel="noreferrer">
+                  {val.title}
+                </Typography>
+                {idx !== links.length - 1 && ", "}
+              </>
+            )
+            )}
+          </Box>
+        )
+      },
     },
     {
       field: "externalLinks",
-      headerName: "Link 2",
-      width: 180,
+      headerName: "External Links",
+      flex: 1,
       sortable: false,
       headerClassName: styles.headerCell,
       cellClassName: styles.tableCell,
-      renderCell: (cell) => (
-        <Box>
-          {(cell.row.externalLinks as any[]).map((val) => val.link).join(", ")}
-        </Box>
-      ),
+      renderCell: (cell) => {
+        const links = (cell.row.externalLinks as any[]);
+
+        return (
+          <Box>
+            {links.map((val, idx) => (
+              <>
+                <Typography component="a" sx={{ textDecoration: "none", color: "#448bff" }} variant="body2" href={val.link} target="_blank" rel="noreferrer">
+                  {val.title}
+                </Typography>
+                {idx !== links.length - 1 && ", "}
+              </>
+            )
+            )}
+          </Box>
+        )
+      },
     },
     {
       field: "actions",
