@@ -50,8 +50,6 @@ function ProfileMenu() {
 
   const user = getCurrentUser()
 
-  console.log(user.email);
-
   return (
     <React.Fragment>
       <Box sx={{ display: "flex", alignItems: "center", textAlign: "center" }}>

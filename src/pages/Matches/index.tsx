@@ -569,7 +569,6 @@ function Matches() {
       void getMatchesForSport();
     } catch (e) {
       console.log(e)
-
     }
   }
 
@@ -584,6 +583,13 @@ function Matches() {
       notify("success", "streaming links deleted successfully!");
     }
   }
+
+  const isF1 = getSportFromSession().league === "f1"
+  const isMMA = getSportFromSession().league === "ufc"
+  const isTennis = getSportFromSession().league === "tournament"
+  const isCfl = getSportFromSession().league === "cfl"
+
+  const hasNoTeam = isF1 || isMMA || isTennis || isCfl
 
   return (
     <Box component="div">
@@ -723,7 +729,7 @@ function Matches() {
                         onChange={(e) => handleDateChange(e)}
                       />
                     </Grid>
-                    {getSportFromSession().league === "f1" ? (
+                    {hasNoTeam ? (
                       <>
                         <Grid item xs={6}>
                           <AppInput label="Event Name" name="description" value={matchData.description} onChange={handleChange} />

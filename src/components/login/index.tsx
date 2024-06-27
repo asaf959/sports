@@ -1,7 +1,5 @@
 import {
   Box,
-  Checkbox,
-  FormControlLabel,
   IconButton,
   InputAdornment,
   Paper,
@@ -111,63 +109,56 @@ function Authentication() {
         }}
       >
         <form method="post" onSubmit={login} onChange={clearAlert}>
-        <Box>
-          <Typography variant="h1" sx={{ textAlign: "center", mb: 2 }}>
-            Login to Account
-          </Typography>
-          <Typography sx={{ mb: 8, textAlign: "center" }}>
-            Please enter your username and password to continue
-          </Typography>
-        </Box>
-        <Box display="flex" flexDirection="column" rowGap={6} mb={3}>
-          <Input name="email" id="email" label="Email" autoFocus={false} autoComplete="none" />
-          <Input
-            name="password"
-            type={password ? "text" : "password"}
-            id="password"
-            label="Password"
-            variant="outlined"
-            autoFocus={false}
-            size="small"
-            fullWidth
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    aria-label="toggle password visibility"
-                    onClick={handlePasswordVisible}
-                    edge="end"
-                  >
-                    {password ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
-        </Box>
-        <Box mb={7}>
-          <FormControlLabel
-            sx={{ color: "rgba(32, 34, 36, 1)", fontSize: "1px" }}
-            control={<Checkbox />}
-            label="Remember Password"
-          />
-        </Box>
-        <Box textAlign="center">
-          <Button
-            variant="contained"
-            fullWidth
-            sx={{ maxWidth: "418px" }}
-            type="submit" disabled={loading}
-          >
-            {loading ? "Logging in" : "Login"}
-            {/* Sign In */}
-          </Button>
-          {!loading && alert?.state && (
-                  <StyledAlert variant="standard" severity={alert.state}>
-                    {alert.message}
-                  </StyledAlert>
-                )}
-        </Box>
+          <Box>
+            <Typography variant="h1" sx={{ textAlign: "center", mb: 2 }}>
+              Login to Account
+            </Typography>
+            <Typography sx={{ mb: 8, textAlign: "center" }}>
+              Please enter your username and password to continue
+            </Typography>
+          </Box>
+          <Box display="flex" flexDirection="column" rowGap={3} mb={6}>
+            <Input name="email" id="email" label="Email" autoFocus={false} autoComplete="none" />
+            <Input
+              name="password"
+              type={password ? "text" : "password"}
+              id="password"
+              label="Password"
+              variant="outlined"
+              autoFocus={false}
+              size="small"
+              fullWidth
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={handlePasswordVisible}
+                      edge="end"
+                    >
+                      {password ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Box>
+          <Box textAlign="center">
+            <Button
+              variant="contained"
+              fullWidth
+              sx={{ maxWidth: "418px" }}
+              type="submit" disabled={loading}
+            >
+              {loading ? "Logging in" : "Login"}
+              {/* Sign In */}
+            </Button>
+            {!loading && alert?.state && (
+              <StyledAlert variant="standard" severity={alert.state}>
+                {alert.message}
+              </StyledAlert>
+            )}
+          </Box>
         </form>
       </Paper>
     </Box>
