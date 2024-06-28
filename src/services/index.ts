@@ -33,8 +33,8 @@ interface TeamData {
 }
 
 type LinkType = {
-  title: string
-  link: string
+  title?: string
+  link?: string
 }
 interface StreamingLinkData extends Sport {
   streamingLinks: LinkType[];

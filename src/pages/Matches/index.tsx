@@ -26,7 +26,7 @@ import dayjs from "dayjs";
 
 interface Link {
   label: string;
-  name: string;
+  name?: string;
   link?: string;
   ExternalLink?: string;
 }
@@ -116,11 +116,11 @@ function Matches() {
   const handleEditClose = () => setEditModalOpen(false);
 
   const [links, setLinks] = React.useState<Link[]>([
-    { label: "Link 1", name: "", link: "" },
-    { label: "Link 2", name: "", link: "" },
+    { label: "Link 1", name: undefined, link: undefined },
+    { label: "Link 2", name: undefined, link: undefined },
   ]);
   const [externalLinks, setExternalLinks] = React.useState<Link[]>([
-    { label: "External Link 1", name: "", ExternalLink: "" },
+    { label: "External Link 1", name: undefined, ExternalLink: undefined },
   ]);
 
   const [teamData, setTeamData] = React.useState<SportStateType[]>([])
@@ -133,7 +133,7 @@ function Matches() {
 
   const handleDateChange = (e: dayjs.Dayjs | null) => {
     if (e) {
-      const date = new Date(`${e.month()}-${e.date()}-${e.year()} ${e.hour()}:${e.minute()}`);
+      const date = new Date(`${e.month() + 1}-${e.date()}-${e.year()} ${e.hour()}:${e.minute()}`);
       setMatchData(prev => ({ ...prev, date: date }))
     }
   }
@@ -226,7 +226,6 @@ function Matches() {
       const date = d.format("MM-DD-YYYY");
       if (!data.sport || !data.league) {
         notify("error", "Sport or league not found");
-        // console.error("Sport or league not found");
         return;
       }
       const response = await API_CALL.getMatches({
@@ -237,25 +236,27 @@ function Matches() {
       setOpen(false);
       setEditModalOpen(false);
       setOpenMatch(false)
-      // console.log("res: ", response.data.data.sport);
 
       setData(response.data.data.sport);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       notify("error", error.response.data.message);
       setData(undefined);
-      // console.error(
-      //   "Error fetching matches for sport:",
-      //   error.response.data.message
-      // );
     }
   };
 
+  const isF1 = getSportFromSession().league === "f1"
+  const isMMA = getSportFromSession().league === "ufc"
+  const isTennis = getSportFromSession().league === "tournament"
+  const isCfl = getSportFromSession().league === "cfl"
+
+  const hasNoTeam = isF1 || isMMA || isTennis || isCfl
+
   const getTeamsForSport = async () => {
+    if (hasNoTeam) return
     try {
       const data = JSON.parse(sessionStorage.getItem("sport") || "{}");
       if (!data.sport || !data.league) {
-        console.error("Sport or league not found in sessionStorage");
         return;
       }
       const response = await API_CALL.getTeams({ sport: data.sport, league: data.league });
@@ -289,6 +290,7 @@ function Matches() {
   React.useEffect(() => {
     void getMatchesForSport();
     void getTeamsForSport();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const rows =
@@ -306,22 +308,19 @@ function Matches() {
         id: idx + 1,
         date: formattedDate,
         time: time,
-        homeTeam: event?.competitors?.length ? event.competitors[0].displayName : [],
-        awayTeam: event?.competitors?.length ? event.competitors[1].displayName : [],
+        homeTeam: event?.competitors?.length ? event.competitors[0]?.displayName : [],
+        awayTeam: event?.competitors?.length ? event.competitors[1]?.displayName : [],
         homeLogo: isUFC ? event?.competitors?.length ? event.competitors[0]?.headshot : [] : event?.competitors?.length ? event.competitors[0]?.logo : [],
         awayLogo: isUFC ? event?.competitors ? event.competitors[1]?.headshot : [] : event?.competitors ? event.competitors[1]?.logo : [],
         leagueLogo: data.logo.href,
         description: event.description + " " + event.note,
-        teams: `${event?.competitors?.length ? event.competitors[0].displayName : ""} vs ${event?.competitors?.length ? event.competitors[1].displayName : ""}`,
+        teams: `${event?.competitors?.length ? event.competitors[0]?.displayName : ""} vs ${event?.competitors?.length ? event.competitors[1]?.displayName : ""}`,
         league: data.league.name,
         streamingLinks: event.streamingLinks,
         externalLinks: event.externalLinks,
         isLocal: event.isLocal
-        // streamingLinks: event.streamingLinks.map(link => link.href).join(', '),
       };
     }) || [];
-
-  // console.log(rows);
 
 
   const style = {
@@ -355,14 +354,15 @@ function Matches() {
       date: new Date(),
     };
     try {
-      await API_CALL.addStreamingLink(data);
+      const streamingLinks = data.streamingLinks.filter(val => val.title && val.link)
+      const externalLinks = data.externalLinks.filter(val => val.title && val.link)
+      const { date, league, sport } = data;
+      await API_CALL.addStreamingLink({ streamingLinks, externalLinks, date, league, sport });
       notify("success", "Streaming links added successfully");
-      // console.log("Streaming links added successfully");
       setOpen(false);
       await getMatchesForSport();
     } catch (error) {
       notify("error", "Error adding streaming links");
-      // console.error("Error adding streaming links:", error);
     }
   };
 
@@ -381,13 +381,11 @@ function Matches() {
     };
     try {
       await API_CALL.updateStreamingLink(selectedItem?._id, data);
-      // console.log("Streaming links updated successfully");
       notify("success", "Streaming links updated successfully");
       setOpen(false);
       await getMatchesForSport();
     } catch (error) {
       notify("error", "Error updating streaming links");
-      // console.error("Error adding streaming links:", error);
     }
   };
 
@@ -518,6 +516,7 @@ function Matches() {
     },
   ];
 
+
   const addMatches = async () => {
     const randomId = Math.random().toString().slice(2, 12);
     const competitors = teamData.filter(team => team.slug === matchData.homeTeam || team.slug === matchData.awayTeam).map(team => {
@@ -528,15 +527,22 @@ function Matches() {
       delete clonedTeam.logos
       return { ...clonedTeam, logo: logo?.href, displayName: clonedTeam.teams }
     })
+
+    if (competitors.length === 1) {
+      notify("error", "Match cannot be created between two same entities")
+      return
+    }
+
+    const date = matchData.date;
+    const now_utc = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
+      date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
+
     try {
       const data = getSportFromSession();
       if (!data.sport || !data.league) {
         notify("error", "Sport or league not found");
         return;
       }
-      const date = matchData.date;
-      const now_utc =  Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
-      date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
 
       const response = await API_CALL.addMatches({
         sport: data.sport,
@@ -580,13 +586,6 @@ function Matches() {
       notify("success", "streaming links deleted successfully!");
     }
   }
-
-  const isF1 = getSportFromSession().league === "f1"
-  const isMMA = getSportFromSession().league === "ufc"
-  const isTennis = getSportFromSession().league === "tournament"
-  const isCfl = getSportFromSession().league === "cfl"
-
-  const hasNoTeam = isF1 || isMMA || isTennis || isCfl
 
   return (
     <Box component="div">
@@ -643,7 +642,7 @@ function Matches() {
         rowHeight={64}
         initialState={{
           pagination: {
-            paginationModel: { page: 0, pageSize: 9 },
+            paginationModel: { page: 0, pageSize: 10 },
           },
         }}
         sx={{
