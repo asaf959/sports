@@ -580,10 +580,8 @@ function Matches() {
   const deleteLink = (idx: number, isExternal = false) => {
     if (isExternal) {
       setExternalLinks(prev => prev.filter((_, id) => id !== idx))
-      notify("success", "External link deleted successfully!");
     } else {
       setLinks(prev => prev.filter((_, id) => id !== idx))
-      notify("success", "streaming links deleted successfully!");
     }
   }
 
@@ -660,6 +658,7 @@ function Matches() {
         }}
       />
 
+      {/* Matches */}
       <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
@@ -777,6 +776,7 @@ function Matches() {
         </Fade>
       </Modal>
 
+      {/* Add Links */}
       <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
@@ -836,15 +836,13 @@ function Matches() {
                           }
                         />
                       </Box>
-                      {links.length !== 1 && (
-                        <IconButton onClick={() => deleteLink(index)}>
-                          <Avatar
-                            src={TrashIcon}
-                            alt="trash Icon"
-                            sx={{ height: "20px", width: "20px", borderRadius: 0 }}
-                          />
-                        </IconButton>
-                      )}
+                      <IconButton onClick={() => deleteLink(index)}>
+                        <Avatar
+                          src={TrashIcon}
+                          alt="trash Icon"
+                          sx={{ height: "20px", width: "20px", borderRadius: 0 }}
+                        />
+                      </IconButton>
                     </Box>
                   </Box>
                 ))}
@@ -854,7 +852,7 @@ function Matches() {
                     startIcon={<AddIcon />}
                     onClick={handleAddLink}
                   >
-                    Add more links
+                    {links.length > 0 ? "Add more links" : "Add streaming link"}
                   </Button>
                 </Box>
               </Box>
@@ -915,15 +913,13 @@ function Matches() {
                             }
                           />
                         </Box>
-                        {externalLinks.length !== 1 && (
-                          <IconButton onClick={() => deleteLink(index, true)}>
-                            <Avatar
-                              src={TrashIcon}
-                              alt="trash Icon"
-                              sx={{ height: "20px", width: "20px", borderRadius: 0 }}
-                            />
-                          </IconButton>
-                        )}
+                        <IconButton onClick={() => deleteLink(index, true)}>
+                          <Avatar
+                            src={TrashIcon}
+                            alt="trash Icon"
+                            sx={{ height: "20px", width: "20px", borderRadius: 0 }}
+                          />
+                        </IconButton>
                       </Box>
                     </Box>
                   ))}
@@ -933,7 +929,7 @@ function Matches() {
                       startIcon={<AddIcon />}
                       onClick={handleAddExternalLink}
                     >
-                      Add more links
+                      {links.length > 1 ? "Add more links" : "Add external link"}
                     </Button>
                   </Box>
                 </Box>
@@ -968,6 +964,7 @@ function Matches() {
         </Fade>
       </Modal>
 
+      {/* Edit Links */}
       <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
@@ -999,7 +996,7 @@ function Matches() {
               component="h2"
               sx={{ fontWeight: 600, mb: 4, textAlign: "center" }}
             >
-              Apply Streaming Links
+              Edit Streaming Links
             </Typography>
             <Box display={"flex"} alignItems={"center"} columnGap={3}>
               <Typography>{selectedItem?.id}:</Typography>
@@ -1017,7 +1014,7 @@ function Matches() {
                 {links.map((link, index) => (
                   <Box key={index}>
                     <Typography>{link.label}:</Typography>
-                    <Box display="flex" columnGap="20px" mt={1}>
+                    <Box display="flex" columnGap="20px" alignItems="flex-end" mt={1}>
                       <Box width="30%">
                         <AppInput
                           label="Name"
@@ -1038,6 +1035,13 @@ function Matches() {
                           }
                         />
                       </Box>
+                      <IconButton onClick={() => deleteLink(index)}>
+                        <Avatar
+                          src={TrashIcon}
+                          alt="trash Icon"
+                          sx={{ height: "20px", width: "20px", borderRadius: 0 }}
+                        />
+                      </IconButton>
                     </Box>
                   </Box>
                 ))}
@@ -1047,7 +1051,7 @@ function Matches() {
                     startIcon={<AddIcon />}
                     onClick={handleAddLink}
                   >
-                    Add more links
+                    {links.length > 0 ? "Add more links" : "Add streaming link"}
                   </Button>
                 </Box>
               </Box>
@@ -1077,7 +1081,7 @@ function Matches() {
                   {externalLinks.map((link, index) => (
                     <Box key={index}>
                       <Typography>{link.label}:</Typography>
-                      <Box display="flex" columnGap="20px" mt={1} mb={2}>
+                      <Box display="flex" columnGap="20px" alignItems="flex-end" mt={1} mb={2}>
                         <Box width="30%">
                           <AppInput
                             label="Name"
@@ -1108,6 +1112,13 @@ function Matches() {
                             }
                           />
                         </Box>
+                        <IconButton onClick={() => deleteLink(index, true)}>
+                          <Avatar
+                            src={TrashIcon}
+                            alt="trash Icon"
+                            sx={{ height: "20px", width: "20px", borderRadius: 0 }}
+                          />
+                        </IconButton>
                       </Box>
                     </Box>
                   ))}
@@ -1117,7 +1128,7 @@ function Matches() {
                       startIcon={<AddIcon />}
                       onClick={handleAddExternalLink}
                     >
-                      Add more links
+                      {externalLinks.length > 0 ? "Add more links" : "Add external link"}
                     </Button>
                   </Box>
                 </Box>
