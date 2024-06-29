@@ -101,15 +101,13 @@ function Channels() {
                       <AppInput name="link" label="Channel link" placeholder="Enter the channel link" value={val.link} onChange={(e) => onChange(idx, e)} />
                     </Grid>
                     <Grid item xs={2}>
-                      {channels.length > 1 && (
-                        <IconButton onClick={() => deleteChannel(idx)}>
-                          <Avatar
-                            src={TrashIcon}
-                            alt="trash Icon"
-                            sx={{ height: "20px", width: "20px", borderRadius: 0 }}
-                          />
-                        </IconButton>
-                      )}
+                      <IconButton onClick={() => deleteChannel(idx)}>
+                        <Avatar
+                          src={TrashIcon}
+                          alt="trash Icon"
+                          sx={{ height: "20px", width: "20px", borderRadius: 0 }}
+                        />
+                      </IconButton>
                     </Grid>
                   </Box>
                 </Box>
