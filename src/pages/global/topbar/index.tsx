@@ -45,7 +45,7 @@ function Header({ className }: Props) {
             <Box mr={"100px"}>
               <img src={logoSvg} alt="Logo" />
             </Box>
-            <img src={`/leagues/${sport.league.toLowerCase()}.png`} alt={sport.league} />
+            <img src={`/leagues/${sport.league.toLowerCase()}.png`} alt={sport.sport} />
             <Box sx={{ ml: "20px", fontSize: "28px", fontWeight: 600 }}>{title}</Box>
           </Box>
 

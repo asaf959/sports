@@ -120,7 +120,7 @@ function Sports() {
           onClick={() => handleSportSelection("racing", "f1")}
         />
         <SportTab
-          sport="MMA"
+          sport="UFC"
           selected={selectedLeague === "ufc"}
           onClick={() => handleSportSelection("mma", "ufc")}
         />
