@@ -3,7 +3,8 @@ import { pickBy } from "lodash";
 
 // import formDataApi from "./formDataInstance";
 import jsonApi from "./jsonInstance";
-import { LoginInterface } from "../interface/auth"
+import { ForgotPasswordInterface, LoginInterface, ResetPasswordInterface, SignupInterface } from "../interface/auth"
+import { Role } from "../pages/users";
 interface Sport {
   sport: string;
   league: string;
@@ -81,8 +82,16 @@ const API_CALL = {
   // auth
   isLoggedIn: async () => jsonApi.get(`auth/is-logged-in`),
   login: async (data: LoginInterface) => jsonApi.post(`auth/login`, data),
+  register: async (data: SignupInterface) => jsonApi.post(`auth/signup`, data),
+  forgotPassword: async (data: ForgotPasswordInterface) => jsonApi.post(`auth/forgot-password`, data),
+  resetPassword: async (token: string, data: ResetPasswordInterface) => jsonApi.post(`auth/reset-password/${token}`, data),
+  verifyEmail: async (token: string) => jsonApi.post(`auth/verify-email/${token}`),
   logout: async () => jsonApi.post(`auth/logout`),
 
+  // users
+  getUsers: async () => jsonApi.get(`managers`),
+  updateRole: async (id: string, role: Role) => jsonApi.patch(`managers/${id}`, { role }),
+  deleteUser: async (id: string) => jsonApi.delete(`managers/${id}`),
   // matches
   getMatches: async (data: SportData) => jsonApi.get(`sports/matches/${data.sport}/${data.league}/${data?.date}`),
 

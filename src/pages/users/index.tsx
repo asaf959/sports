@@ -1,7 +1,7 @@
 import {
   Avatar,
   Box,
-  // IconButton,
+  Chip,
   InputAdornment,
   List,
   ListItem,
@@ -14,16 +14,49 @@ import styles from "./style.module.scss";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import Input from "../../components/input";
 import SearchIcon from "@mui/icons-material/Search";
-import namePic from "../../assets/img/profileImg.png";
-import { useNavigate } from "react-router-dom";
-import EditIcon from "../../assets/svg/edit.svg";
 import deleteIcon from "../../assets/svg/delete.svg";
 
 import IconButton from "../../components/iconButton";
-import { editUserPath } from "../../router/path";
+import { useEffect, useState } from "react";
+import API_CALL from "../../services";
+import { Button } from "../../components/button";
+import showToast from "../../utils/notify";
+import { getCurrentUser } from "../../utils/session";
+
+export enum Role {
+  ADMIN = "admin",
+  MODERATOR = "moderator",
+  USER = "user"
+}
+
+type User = {
+  _id: string,
+  email: string,
+  isVerified: boolean,
+  role: string,
+  createdAt: string,
+  updatedAt: string,
+  verifiedAt: string,
+  id: string,
+}
 
 function Users() {
-  const navigate = useNavigate();
+  const [users, setUsers] = useState<User[]>([]);
+
+  const getUsers = async () => {
+    try {
+      const { data: res } = await API_CALL.getUsers()
+      setUsers(res.data.users);
+    } catch (err: any) {
+      console.log(err.response.data.message);
+    }
+  }
+
+  const currentUser = getCurrentUser()
+
+  useEffect(() => {
+    void getUsers()
+  }, []);
 
   const Table = styled(DataGrid)`
     & .MuiDataGrid-root {
@@ -42,9 +75,28 @@ function Users() {
     // }
   `;
 
-  const handleEditUser = () => {
-    navigate(editUserPath);
+  const mappedUsers = users.filter(val => val._id !== currentUser._id).map((val, idx) => ({ ...val, id: idx + 1 }))
+
+  const updateRole = async (id: string, role: Role) => {
+    try {
+      await API_CALL.updateRole(id, role)
+      showToast("success", "Role Updated")
+      void getUsers();
+    } catch (err: any) {
+      console.log(err.response.data.message);
+    }
   };
+
+  const deleteUser = async (id: string) => {
+    try {
+      await API_CALL.deleteUser(id)
+      showToast("success", "User deleted")
+      void getUsers();
+    } catch (err) {
+
+    }
+  }
+
   const columns: GridColDef[] = [
     {
       field: "id",
@@ -57,8 +109,8 @@ function Users() {
       align: "center",
     },
     {
-      field: "name",
-      headerName: "Name",
+      field: "email",
+      headerName: "Email",
       flex: 1,
       headerAlign: "center",
       align: "center",
@@ -68,19 +120,10 @@ function Users() {
         <List>
           <ListItem>
             <ListItemAvatar>
-              <Avatar
-                sx={
-                  detail.row.gender === "male"
-                    ? { backgroundColor: "rgba(68, 139, 255,0.6)" }
-                    : { backgroundColor: "rgba(211, 47, 47, 0.4)" }
-                }
-                src={namePic}
-              >
-                {/* {capitalize(detail.row.name).slice(0, 2)} */}
-              </Avatar>
+              <Avatar />
             </ListItemAvatar>
             <ListItemText
-              secondary={"Thomas Shelby"}
+              secondary={detail.row.email}
               secondaryTypographyProps={{
                 variant: "subtitle1",
                 color: "text.primary",
@@ -91,41 +134,58 @@ function Users() {
       ),
     },
     {
-      field: "league",
-      headerName: "Username",
+      field: "role",
+      headerName: "Role",
       flex: 1,
       sortable: false,
       headerClassName: styles.headerCell,
       cellClassName: styles.tableCell,
       headerAlign: "center",
       align: "center",
+      renderCell: (detail) => (
+        <Chip
+          color={detail.row.role === "user" ? "warning" : "primary"}
+          sx={{ fontSize: 12, fontWeight: 500 }}
+          label={detail.row.role.toUpperCase()}
+        />
+      )
     },
     {
-      field: "country",
-      headerName: "Password",
+      field: "isVerified",
+      headerName: "Verification",
       flex: 1,
       sortable: false,
       headerClassName: styles.headerCell,
       cellClassName: styles.tableCell,
       headerAlign: "center",
       align: "center",
+      renderCell: (detail) => (
+        <Chip
+          color={detail.row.isVerified ? "success" : "error"}
+          sx={{ fontSize: 12, fontWeight: 500 }}
+          label={detail.row.isVerified ? "Verified" : "Unverified"}
+        />
+      )
     },
     {
-      field: "actions",
+      field: "action",
       headerName: "Actions",
       align: "center",
       headerAlign: "center",
-      width: 150,
-      renderCell: () => (
-        <Box display="flex" columnGap={"6px"}>
-          <IconButton onClick={handleEditUser}>
-            <Avatar
-              src={EditIcon}
-              alt="edit Icon"
-              sx={{ height: "20px", width: "20px", borderRadius: 0 }}
-            />
-          </IconButton>
-          <IconButton>
+      width: 270,
+      renderCell: (detail) => (
+        <Box display="flex" alignItems="center" justifyContent="flex-end" height="100%" columnGap={"6px"}>
+          {console.log(detail.row.role) as any as string}
+          <Button
+            title={detail.row.role === "user" ? "Make Moderator" : "Make User"}
+            color={detail.row.role === "user" ? "primary" : "warning"}
+            variant="contained"
+            size="small"
+            onClick={() => updateRole(detail.row._id, detail.row.role === Role.MODERATOR ? Role.USER : Role.MODERATOR)}
+          >
+            {detail.row.role === "user" ? "Make Moderator" : "Make User"}
+          </Button>
+          <IconButton onClick={() => deleteUser(detail.row._id)}>
             <Avatar
               src={deleteIcon}
               alt="edit Icon"
@@ -135,23 +195,6 @@ function Users() {
         </Box>
       ),
     },
-  ];
-
-  const rows = [
-    { id: 1, teams: "Real Madrid", league: "League 1", country: "Country A" },
-    { id: 2, teams: "FC Barcelona", league: "League 2", country: "Country B" },
-    { id: 3, teams: "Ud Las Palmas", league: "League 3", country: "Country C" },
-    { id: 4, teams: "Osasuna FC", league: "League 4", country: "Country D" },
-    { id: 5, teams: "FC Girona ", league: "League 5", country: "Country E" },
-    { id: 6, teams: "Rayo Valecano", league: "League 6", country: "Country F" },
-    { id: 7, teams: "Real Betis", league: "League 7", country: "Country G" },
-    {
-      id: 8,
-      teams: "Athletico Madrid",
-      league: "League 8",
-      country: "Country H",
-    },
-    { id: 9, teams: "Real Sociedad", league: "League 9", country: "Country I" },
   ];
 
   return (
@@ -185,7 +228,7 @@ function Users() {
         />
       </Box>
       <Table
-        rows={rows}
+        rows={mappedUsers}
         columns={columns}
         columnHeaderHeight={54}
         rowHeight={64}
@@ -196,13 +239,15 @@ function Users() {
         }}
         sx={{
           backgroundColor: "#ffff",
+          height: mappedUsers.length === 0 ? "200px" : "auto",
         }}
         pageSizeOptions={[5, 10]}
         className={styles.dataGrid}
         disableColumnFilter
-        checkboxSelection
         disableColumnMenu
-        disableRowSelectionOnClick
+        localeText={{
+          noRowsLabel: "No Data available",
+        }}
       />
     </Box>
   );

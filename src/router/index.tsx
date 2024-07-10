@@ -33,10 +33,9 @@ const combinationRoutes: RouteObject[] = [
     element: <Combination />,
   },
 ];
-
 const usersRoutes: RouteObject[] = [
   {
-    path: path.userPath,
+    path: path.usersPath,
     element: <Users />,
   },
 ];
@@ -52,7 +51,6 @@ const alternateLinksRoutes: RouteObject[] = [
     element: <AlternateLinks />,
   },
 ];
-
 const manageAccountRoutes: RouteObject[] = [
   {
     path: path.manageAccountPath,
@@ -94,6 +92,7 @@ const router: RouteObject[] = [
               ...channelsRoutes,
               ...alternateLinksRoutes,
               ...manageAccountRoutes,
+              ...usersRoutes
             ],
           },
         ],

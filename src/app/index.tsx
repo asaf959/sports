@@ -11,7 +11,7 @@ import { setUser } from "../utils/session";
 
 import Router from "./router";
 import API_CALL from "../services";
-import Authentication from "../components/login";
+import Authentication from "../components/auth";
 import { LocalizationProvider } from '@mui/x-date-pickers';
 
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
@@ -27,7 +27,7 @@ function App(): JSX.Element {
       const { data: res } = await API_CALL.isLoggedIn();
       setUser(res.data.user);
 
-      if ((res.data.user.role === "user") || res.data.user.role === "admin") setloginStatus("loggedin");
+      if (res.data.user.role === "moderator" || res.data.user.role === "admin") setloginStatus("loggedin");
     } catch (error: unknown) {
       setloginStatus("loggedout");
     }

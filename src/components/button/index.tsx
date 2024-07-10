@@ -26,7 +26,7 @@ export const Button = styled((props: ButtonProps) => {
       text-transform: none;
       white-space: nowrap;
     }
-  
+
     &.MuiButton-sizeSmall {
       padding: ${theme.typography.pxToRem(8)} ${theme.typography.pxToRem(16)};
       text-transform: none;
@@ -44,7 +44,7 @@ export const LabelButton = styled((props: InputLabelProps) => {
   text-transform: none;
   white-space: nowrap;
   font-size:14px;
-  pointer-events: unset;  
+  pointer-events: unset;
   display: inline-block;
   cursor: pointer;
   background-color: ${theme.palette.primary.main};

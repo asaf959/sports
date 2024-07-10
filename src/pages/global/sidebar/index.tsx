@@ -14,6 +14,7 @@ import JoinFullOutlinedIcon from "@mui/icons-material/JoinFullOutlined";
 import KeyboardBackspaceOutlinedIcon from "@mui/icons-material/KeyboardBackspaceOutlined";
 // import PeopleOutlineIcon from "@mui/icons-material/PeopleOutline";
 import LinkIcon from '@mui/icons-material/Link';
+import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
 
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -24,6 +25,7 @@ import {
   combinationPath,
   channelPath,
   alternateLinksPath,
+  usersPath,
   // sportsPath,
 } from "../../../router/path";
 import {
@@ -33,6 +35,7 @@ import {
   dashboardTitle,
   matchesTitle,
   teamsTitle,
+  usersTitle,
 } from "../../../router/title";
 import useStore from "../../../store";
 import ConnectedTvIcon from '@mui/icons-material/ConnectedTv';
@@ -45,8 +48,8 @@ const StyledListItemButton = styled(ListItemButton)`
 
   &, .MuiListItemIcon-root {
     transition: ${theme.transitions.create(["scale", "color"], {
-      duration: theme.transitions.duration.standard,
-    })};
+  duration: theme.transitions.duration.standard,
+})};
   }
 
   &::before, &::after {
@@ -94,6 +97,7 @@ interface ListItemInterface {
   name: string;
   icon: JSX.Element;
   url: string;
+  authorized: boolean
 }
 
 const ListItems: ListItemInterface[] = [
@@ -101,39 +105,52 @@ const ListItems: ListItemInterface[] = [
     name: dashboardTitle,
     icon: <HomeOutlinedIcon />,
     url: dashboardPath,
+    authorized: false
   },
   {
     name: teamsTitle,
     icon: <Groups2OutlinedIcon />,
     url: teamsPath,
+    authorized: false
   },
   {
     name: matchesTitle,
     icon: <CalendarMonthOutlinedIcon />,
     url: matchPath,
+    authorized: false
   },
   {
     name: combinationTitle,
     icon: <JoinFullOutlinedIcon />,
     url: combinationPath,
+    authorized: false
   },
   {
     name: channelsTitle,
     icon: <ConnectedTvIcon />,
     url: channelPath,
+    authorized: false
   },
   {
     name: alternateLinkTitle,
-    icon: <LinkIcon/>,
+    icon: <LinkIcon />,
     url: alternateLinksPath,
+    authorized: false
   },
 ];
 
 const secondary: ListItemInterface[] = [
   {
+    name: usersTitle,
+    icon: <PeopleAltOutlinedIcon />,
+    url: usersPath,
+    authorized: true
+  },
+  {
     name: "All Sports",
     icon: <KeyboardBackspaceOutlinedIcon />,
     url: "/",
+    authorized: false
   },
 ];
 
@@ -150,7 +167,7 @@ export default function Sidebar({ className }: Props) {
         {ListItems.filter(item => {
           if (item.name === teamsTitle)
             return !removeTeamsOnSpecificRoutes()
-        return true
+          return true
         }).map((item, idx) => (
           <ListItem key={idx} disablePadding>
             <StyledListItemButton
