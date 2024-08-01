@@ -302,7 +302,7 @@ function Matches() {
         minute: "2-digit",
       });
 
-      const isUFC = data.league.slug.toLowerCase() === 'ufc';
+      const isUFC = data.league.slug?.toLowerCase() === 'ufc';
       return {
         _id: event._id,
         id: idx + 1,
@@ -634,7 +634,7 @@ function Matches() {
       </Box>
 
       <Table
-        rows={rows.filter(val => `${val.awayTeam} vs ${val.homeTeam}`.toLowerCase().includes(search.toLowerCase()))}
+        rows={rows.filter(val => (val.awayTeam ? `${val.awayTeam} vs ${val.homeTeam}` : val.description)?.toLowerCase().includes(search.toLowerCase()))}
         columns={columns}
         columnHeaderHeight={54}
         rowHeight={64}
