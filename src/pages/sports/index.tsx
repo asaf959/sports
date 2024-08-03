@@ -10,11 +10,13 @@ import API_CALL from "../../services";
 import { removeUser } from "../../utils/session";
 import { useLoggedInUpdate } from "../../loggedInContext";
 import { capitalize } from "lodash";
+import showToast from "../../utils/notify";
+import { getSportFromSession } from "../../utils/utils";
 
 function Sports() {
   const { setTitle } = useStore();
   const navigate = useNavigate();
-  const [selectedLeague, setSelectedLeague] = useState<string>("");
+  const [selectedLeague, setSelectedLeague] = useState<string>(getSportFromSession()?.league);
   const setloginStatus = useLoggedInUpdate();
 
   const handleSportSelection = (sport: string, league: string) => {
@@ -136,7 +138,10 @@ function Sports() {
           fullWidth
           sx={{ maxWidth: "300px" }}
           onClick={() => {
-            navigate(dashboardPath);
+            if (getSportFromSession()?.league)
+              navigate(dashboardPath);
+            else
+              showToast("error", "Please select a sport first")
           }}
         >
           Go to Dashboard
