@@ -232,6 +232,7 @@ function Matches() {
         sport: data.sport,
         league: data.league,
         date,
+        timezone: new Date().getTimezoneOffset() / 60
       });
       setOpen(false);
       setEditModalOpen(false);
@@ -308,6 +309,7 @@ function Matches() {
         id: idx + 1,
         date: formattedDate,
         time: time,
+        timestamp: dateObj.getTime(),
         homeTeam: event?.competitors?.length ? event.competitors[0]?.displayName : [],
         awayTeam: event?.competitors?.length ? event.competitors[1]?.displayName : [],
         homeLogo: isUFC ? event?.competitors?.length ? event.competitors[0]?.headshot : [] : event?.competitors?.length ? event.competitors[0]?.logo : [],
@@ -320,7 +322,7 @@ function Matches() {
         externalLinks: event.externalLinks,
         isLocal: event.isLocal
       };
-    }) || [];
+    }).sort((a, b) => b.timestamp - a.timestamp).map((val, idx) => ({...val, id: idx + 1})) || [];
 
 
   const style = {
@@ -357,7 +359,7 @@ function Matches() {
       const streamingLinks = data.streamingLinks.filter(val => val.title && val.link)
       const externalLinks = data.externalLinks.filter(val => val.title && val.link)
       const { date, league, sport } = data;
-      await API_CALL.addStreamingLink({ streamingLinks, externalLinks, date, league, sport });
+      await API_CALL.addStreamingLink({ streamingLinks, externalLinks, date, league, sport, timezone: new Date().getTimezoneOffset() / 60 });
       notify("success", "Streaming links added successfully");
       setOpen(false);
       await getMatchesForSport();
@@ -389,6 +391,8 @@ function Matches() {
     }
   };
 
+  rows.sort()
+
   const columns: GridColDef[] = [
     {
       field: "id",
@@ -404,7 +408,7 @@ function Matches() {
       field: "date",
       headerName: "Date",
       width: 100,
-      sortable: false,
+      sortable: true,
       headerClassName: styles.headerCell,
       cellClassName: styles.tableCell,
     },
@@ -516,7 +520,6 @@ function Matches() {
     },
   ];
 
-
   const addMatches = async () => {
     const randomId = Math.random().toString().slice(2, 12);
     const competitors = teamData.filter(team => team.slug === matchData.homeTeam || team.slug === matchData.awayTeam).map(team => {
@@ -553,7 +556,8 @@ function Matches() {
         eventId: randomId,
         description: matchData.description,
         note: matchData.note,
-        competitors
+        competitors,
+        timezone: new Date().getTimezoneOffset() / 60
       });
       setOpenMatch(false)
       setData(response.data.data.sport);

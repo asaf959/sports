@@ -12,6 +12,7 @@ interface Sport {
 interface SportData extends Sport {
   date?: string;
   team?: string;
+  timezone: number
 }
 interface CombinationData extends Sport {
   combination: {
@@ -41,6 +42,7 @@ interface StreamingLinkData extends Sport {
   streamingLinks: LinkType[];
   externalLinks: LinkType[];
   date: Date
+  timezone?: number
 }
 
 interface Matchesdata extends Sport, TeamData {
@@ -50,7 +52,8 @@ interface Matchesdata extends Sport, TeamData {
   isLocal: boolean;
   description?: string
   note?: string
-  competitors: any[]
+  competitors: any[],
+  timezone: number
 }
 interface UserUpdateProfileType {
   name: string;
@@ -93,7 +96,7 @@ const API_CALL = {
   updateRole: async (id: string, role: Role) => jsonApi.patch(`managers/${id}`, { role }),
   deleteUser: async (id: string) => jsonApi.delete(`managers/${id}`),
   // matches
-  getMatches: async (data: SportData) => jsonApi.get(`sports/matches/${data.sport}/${data.league}/${data?.date}`),
+  getMatches: async (data: SportData) => jsonApi.get(`sports/matches/${data.sport}/${data.league}/${data?.date}/${data.timezone}`),
 
   // add streaming links
   addStreamingLink: async (data: StreamingLinkData) => jsonApi.post(`sports/links/`, data),
