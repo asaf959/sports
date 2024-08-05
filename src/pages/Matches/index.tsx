@@ -231,8 +231,7 @@ function Matches() {
       const response = await API_CALL.getMatches({
         sport: data.sport,
         league: data.league,
-        date,
-        timezone: new Date().getTimezoneOffset() / 60
+        date
       });
       setOpen(false);
       setEditModalOpen(false);
@@ -359,7 +358,7 @@ function Matches() {
       const streamingLinks = data.streamingLinks.filter(val => val.title && val.link)
       const externalLinks = data.externalLinks.filter(val => val.title && val.link)
       const { date, league, sport } = data;
-      await API_CALL.addStreamingLink({ streamingLinks, externalLinks, date, league, sport, timezone: new Date().getTimezoneOffset() / 60 });
+      await API_CALL.addStreamingLink({ streamingLinks, externalLinks, date, league, sport });
       notify("success", "Streaming links added successfully");
       setOpen(false);
       await getMatchesForSport();
@@ -537,8 +536,6 @@ function Matches() {
     }
 
     const date = matchData.date;
-    const now_utc = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
-      date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
 
     try {
       const data = getSportFromSession();
@@ -550,14 +547,13 @@ function Matches() {
       const response = await API_CALL.addMatches({
         sport: data.sport,
         league: data.league,
-        date: new Date(now_utc),
+        date: date.toISOString(),
         isLocal: true,
         matchId: randomId,
         eventId: randomId,
         description: matchData.description,
         note: matchData.note,
-        competitors,
-        timezone: new Date().getTimezoneOffset() / 60
+        competitors
       });
       setOpenMatch(false)
       setData(response.data.data.sport);
@@ -709,7 +705,7 @@ function Matches() {
                   <Grid container spacing={2}>
                     <Grid item xs={12} >
                       <DateTimePicker
-                        label="Select a Sport"
+                        label="Select a date (UTC)"
                         defaultValue={matchDate}
                         sx={{
                           width: "100%",
